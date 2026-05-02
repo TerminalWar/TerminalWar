@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TerminalWar :: Access Node</title>
+    <link rel="stylesheet" href="./login.css" />
+  </head>
+  <body>
+    <main class="screen">
+      <section id="intro" class="panel intro-panel">
+        <pre id="introOutput"></pre>
+      </section>
+
+      <section id="authPanel" class="panel hidden">
+        <h1>TERMINAL WAR</h1>
+        <p class="subtitle">Secure Access Console</p>
+
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="email" placeholder="operator@grid.net" />
+
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" />
+
+        <div class="actions">
+          <button id="loginBtn">Log In</button>
+          <button id="signupBtn" class="secondary">Sign Up</button>
+        </div>
+
+        <p id="status" role="status" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <script type="module" src="./login.js"></script>
+  </body>
+</html>
