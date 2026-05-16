@@ -2,6 +2,7 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 import { auth } from "../shared/firebase.js";
 import { signUp, login } from "./auth.js";
 import { runIntro, startMatrixRain } from "./intro.js";
+import { goToGame, replaceLoginUrl } from "../shared/navigation.js";
 
 const usernameInput = document.getElementById("username");
 const emailInput = document.getElementById("email");
@@ -45,10 +46,6 @@ function mapAuthError(errorCode) {
   }
 }
 
-function redirectToGame() {
-  window.location.href = "/game/";
-}
-
 switchBtn.addEventListener("click", () => setMode(!isSignupMode));
 
 forceLogoutBtn.addEventListener("click", async () => {
@@ -64,7 +61,7 @@ loginBtn.addEventListener("click", async () => {
   statusMsg.textContent = "Verifying credentials...";
   try {
     await login(email, password);
-    redirectToGame();
+    goToGame();
   } catch (error) {
     statusMsg.textContent = mapAuthError(error.code);
   }
@@ -79,14 +76,14 @@ signupBtn.addEventListener("click", async () => {
   statusMsg.textContent = "Registering Neural_ID...";
   try {
     await signUp(email, password, username);
-    redirectToGame();
+    goToGame();
   } catch (error) {
     statusMsg.textContent = mapAuthError(error.code);
   }
 });
 
 onAuthStateChanged(auth, async (user) => {
-  if (user && !loggedOutFlag) return redirectToGame();
+  if (user && !loggedOutFlag) return goToGame();
 
   if (!introDone) {
     await runIntro();
@@ -98,6 +95,6 @@ onAuthStateChanged(auth, async (user) => {
 
   if (loggedOutFlag) {
     statusMsg.textContent = "Logged out successfully. Test away.";
-    window.history.replaceState({}, "", "/login/");
+    replaceLoginUrl();
   }
 });
