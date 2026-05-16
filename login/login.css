@@ -1110,3 +1110,389 @@ body[data-performance="low"] .post-login-cutscene {
 body[data-sequence="handoff"] #matrixCanvas {
   opacity: 0.08;
 }
+
+/* final cinematic pass: separate desktop/mobile language and 30-second asset handoff */
+.intro-cinematic {
+  position: relative;
+  height: clamp(190px, 32vh, 310px);
+  margin: 16px 0 18px;
+  overflow: hidden;
+  border: 1px solid rgba(69, 255, 209, 0.22);
+  background: linear-gradient(145deg, rgba(2, 8, 18, 0.94), rgba(3, 18, 31, 0.62));
+  clip-path: polygon(22px 0, 100% 0, calc(100% - 28px) 100%, 0 100%);
+}
+
+.cinema-map {
+  position: absolute;
+  inset: 12px;
+  background:
+    radial-gradient(circle at 62% 44%, rgba(255, 67, 104, 0.12), transparent 14%),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(115, 247, 255, 0.04) 47px 48px),
+    repeating-linear-gradient(0deg, transparent 0 38px, rgba(115, 247, 255, 0.035) 39px 40px);
+  animation: cinemaDrift 14s linear infinite;
+}
+
+.continent,
+.cinema-bomber,
+.impact-ring,
+.fallout-front {
+  position: absolute;
+  display: block;
+}
+
+.continent {
+  background: rgba(115, 247, 255, 0.08);
+  border: 1px solid rgba(115, 247, 255, 0.22);
+  filter: drop-shadow(0 0 12px rgba(115, 247, 255, 0.2));
+}
+
+.continent-west {
+  left: 8%; top: 27%; width: 28%; height: 42%;
+  clip-path: polygon(5% 20%, 42% 0, 77% 16%, 92% 48%, 74% 78%, 38% 100%, 0 72%);
+}
+
+.continent-east {
+  right: 7%; top: 19%; width: 42%; height: 53%;
+  clip-path: polygon(8% 34%, 24% 5%, 58% 0, 96% 19%, 88% 51%, 100% 76%, 62% 96%, 22% 82%, 0 58%);
+}
+
+.cinema-bomber,
+.bomber,
+.nuke-bomber {
+  width: 54px;
+  height: 26px;
+  background: linear-gradient(90deg, transparent 0 8%, #bffcff 9% 18%, #73f7ff 19% 70%, transparent 71%),
+              linear-gradient(180deg, transparent 0 36%, rgba(115, 247, 255, 0.9) 37% 62%, transparent 63%);
+  clip-path: polygon(0 44%, 64% 44%, 100% 0, 84% 50%, 100% 100%, 64% 56%, 0 56%);
+  filter: drop-shadow(0 0 10px rgba(115, 247, 255, 0.75));
+}
+
+.bomber-alpha { left: -10%; top: 33%; animation: bomberCross 6.5s linear infinite; }
+.bomber-bravo { left: -16%; top: 58%; animation: bomberCross 7.8s linear infinite 1.6s; }
+
+.impact-ring {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 1px solid rgba(255, 67, 104, 0.9);
+  box-shadow: 0 0 18px rgba(255, 67, 104, 0.55);
+  animation: nuclearPulse 2.4s ease-out infinite;
+}
+.impact-one { right: 29%; top: 44%; }
+.impact-two { right: 18%; top: 62%; animation-delay: 900ms; }
+
+.fallout-front {
+  left: -20%; right: -20%; bottom: -42%; height: 52%;
+  background: radial-gradient(ellipse at center, rgba(115, 247, 255, 0.14), transparent 70%);
+  animation: falloutRise 7s ease-in-out infinite;
+}
+
+.cinema-warning {
+  position: absolute;
+  left: 16px;
+  bottom: 12px;
+  color: var(--red);
+  letter-spacing: 0.16em;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+.intro-lore {
+  margin: -2px 0 14px;
+  color: #7faabd;
+  line-height: 1.55;
+}
+
+.post-login-cutscene {
+  --handoff-duration: 30s;
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 320px);
+}
+
+.cutscene-phase {
+  position: relative;
+  grid-column: 1;
+  grid-row: 1;
+  min-height: min(64vh, 560px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.phase-map { animation: phaseMap 30s linear both; }
+.phase-ground { animation: phaseGround 30s linear both; }
+
+.russia-map,
+.topography-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border: 1px solid rgba(115, 247, 255, 0.2);
+  background:
+    radial-gradient(circle at 50% 45%, rgba(45, 130, 255, 0.16), transparent 36%),
+    linear-gradient(180deg, rgba(3, 12, 26, 0.7), rgba(1, 5, 13, 0.92));
+  clip-path: polygon(30px 0, 100% 0, 100% calc(100% - 42px), calc(100% - 42px) 100%, 0 100%, 0 30px);
+}
+
+.russia-landmass {
+  position: absolute;
+  left: 8%; top: 19%; width: 82%; height: 52%;
+  background: rgba(115, 247, 255, 0.1);
+  border: 1px solid rgba(115, 247, 255, 0.34);
+  clip-path: polygon(2% 42%, 13% 24%, 31% 27%, 45% 10%, 65% 17%, 86% 9%, 98% 27%, 90% 48%, 96% 68%, 76% 79%, 60% 67%, 44% 86%, 28% 72%, 12% 76%, 0 59%);
+  filter: drop-shadow(0 0 24px rgba(115, 247, 255, 0.22));
+}
+
+.map-scan {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent, rgba(115, 247, 255, 0.16), transparent);
+  animation: scanBeam 4s ease-in-out infinite;
+}
+
+.bomber-routes {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+}
+
+.bomber-routes path {
+  fill: none;
+  stroke: rgba(115, 247, 255, 0.72);
+  stroke-width: 3;
+  stroke-dasharray: 16 18;
+  animation: dashMove 4s linear infinite;
+}
+
+.bomber {
+  position: absolute;
+  left: -12%;
+  transform: scale(1.15);
+}
+.bomber-one { top: 25%; animation: bomberCross 10s linear infinite; }
+.bomber-two { top: 48%; animation: bomberCross 11.5s linear infinite 1.8s; }
+.bomber-three { top: 67%; animation: bomberCross 13s linear infinite 3.1s; }
+
+.target-ping {
+  position: absolute;
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 2px solid rgba(255, 67, 104, 0.95);
+  box-shadow: 0 0 24px rgba(255, 67, 104, 0.75);
+  animation: targetPing 1.8s ease-out infinite;
+}
+.target-moscow { left: 42%; top: 48%; }
+.target-ural { left: 58%; top: 43%; animation-delay: 500ms; }
+.target-siberia { left: 75%; top: 54%; animation-delay: 950ms; }
+
+.topography-field {
+  background:
+    linear-gradient(180deg, rgba(2, 12, 24, 0.2), rgba(1, 4, 9, 0.95)),
+    repeating-linear-gradient(165deg, rgba(115, 247, 255, 0.16) 0 2px, transparent 3px 28px);
+  perspective: 800px;
+}
+
+.terrain-line {
+  position: absolute;
+  left: -20%; right: -20%; height: 32%;
+  border: 1px solid rgba(115, 247, 255, 0.18);
+  border-radius: 50%;
+  transform: rotateX(64deg);
+  animation: terrainWave 5s ease-in-out infinite;
+}
+.terrain-one { bottom: 6%; }
+.terrain-two { bottom: 18%; animation-delay: 600ms; }
+.terrain-three { bottom: 31%; animation-delay: 1.2s; }
+
+.nuke-bomber {
+  position: absolute;
+  left: 8%; top: 12%;
+  width: 150px; height: 74px;
+  animation: heavyBomberPass 13s ease-in-out infinite;
+}
+
+.falling-nuke {
+  position: absolute;
+  left: 50%; top: 28%;
+  width: 10px; height: 34px;
+  background: linear-gradient(180deg, #e8fbff, #73f7ff);
+  clip-path: polygon(50% 0, 100% 24%, 72% 100%, 28% 100%, 0 24%);
+  filter: drop-shadow(0 0 10px rgba(115, 247, 255, 0.85));
+  animation: nukeDrop 8s ease-in infinite;
+}
+
+.mushroom-cloud {
+  position: absolute;
+  left: 44%; bottom: 15%;
+  width: 120px; height: 138px;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(232, 251, 255, 0.85) 0 18%, rgba(115, 247, 255, 0.22) 19% 38%, transparent 40%),
+    radial-gradient(circle at 30% 35%, rgba(115, 247, 255, 0.34), transparent 34%),
+    radial-gradient(circle at 70% 35%, rgba(115, 247, 255, 0.3), transparent 34%),
+    linear-gradient(90deg, transparent 36%, rgba(115, 247, 255, 0.34) 42% 58%, transparent 64%);
+  opacity: 0;
+  filter: drop-shadow(0 0 28px rgba(115, 247, 255, 0.7));
+  animation: mushroomBloom 8s ease-out infinite 2.4s;
+}
+
+.phase-copy {
+  position: absolute;
+  left: clamp(18px, 4vw, 44px);
+  bottom: clamp(18px, 4vw, 44px);
+  width: min(540px, 78%);
+  z-index: 2;
+}
+
+.phase-copy h2 {
+  margin: 8px 0 12px;
+  color: #e8fbff;
+  font-size: clamp(1.8rem, 4.4vw, 4.7rem);
+  line-height: 0.92;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 0 0 22px rgba(115, 247, 255, 0.44);
+}
+
+.phase-copy p:not(.panel-kicker) {
+  color: #9bc7d9;
+  line-height: 1.6;
+}
+
+.loading-sidebar {
+  position: relative;
+  z-index: 3;
+  grid-column: 2;
+  grid-row: 1;
+  align-self: stretch;
+  display: grid;
+  align-content: end;
+  gap: 14px;
+  padding: 22px;
+  background: rgba(3, 12, 24, 0.62);
+  border: 1px solid rgba(69, 255, 209, 0.24);
+  clip-path: polygon(18px 0, 100% 0, calc(100% - 18px) 100%, 0 100%);
+}
+
+.asset-status,
+.asset-percent,
+.tip-box span {
+  color: var(--teal);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.asset-bar {
+  height: 12px;
+  border: 1px solid rgba(69, 255, 209, 0.38);
+  background: rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+}
+
+.asset-bar span {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform-origin: left center;
+  transform: scaleX(0);
+  background: linear-gradient(90deg, rgba(69, 255, 209, 0.45), #e8fbff);
+  animation: assetDownload 30s linear forwards;
+}
+
+.tip-box {
+  padding: 16px;
+  min-height: 128px;
+  border: 1px solid rgba(115, 247, 255, 0.24);
+  background: rgba(1, 8, 16, 0.72);
+}
+
+.tip-box p {
+  margin: 10px 0 0;
+  color: #a9d4e7;
+  line-height: 1.55;
+}
+
+@keyframes cinemaDrift { to { transform: translate3d(-24px, 0, 0); } }
+@keyframes bomberCross { from { transform: translateX(0) scale(1.1); } to { transform: translateX(120vw) scale(1.1); } }
+@keyframes falloutRise { 50% { transform: translateY(-18%); opacity: 0.78; } }
+@keyframes phaseMap { 0%, 45% { opacity: 1; } 51%, 100% { opacity: 0; } }
+@keyframes phaseGround { 0%, 47% { opacity: 0; } 54%, 100% { opacity: 1; } }
+@keyframes targetPing { 0% { transform: scale(0.45); opacity: 0; } 40% { opacity: 1; } 100% { transform: scale(2.7); opacity: 0; } }
+@keyframes terrainWave { 50% { transform: rotateX(64deg) translateY(-10px); opacity: 0.72; } }
+@keyframes heavyBomberPass { 0% { transform: translateX(-30vw) scale(1.3); } 100% { transform: translateX(90vw) scale(1.3); } }
+@keyframes nukeDrop { 0%, 35% { opacity: 0; transform: translateY(-40px); } 45% { opacity: 1; } 80%, 100% { opacity: 0; transform: translateY(230px); } }
+@keyframes mushroomBloom { 0%, 25% { opacity: 0; transform: scale(0.35) translateY(40px); } 55% { opacity: 1; } 100% { opacity: 0.16; transform: scale(1.55) translateY(-34px); } }
+@keyframes assetDownload { to { transform: scaleX(1); } }
+
+body[data-device="mobile"] .screen {
+  display: flex;
+  min-height: calc(var(--app-vh, 1vh) * 100);
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+body[data-device="mobile"] .panel,
+body[data-device="mobile"] .auth-panel {
+  width: min(94vw, 430px);
+  padding: 18px 14px;
+  border-radius: 0;
+  clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%, 0 18px);
+}
+
+body[data-device="mobile"] .intro-cinematic {
+  height: 185px;
+}
+
+body[data-device="mobile"] .auth-grid {
+  gap: 12px;
+}
+
+body[data-device="mobile"] .identity-stack {
+  display: flex;
+  justify-content: center;
+}
+
+body[data-device="mobile"] .signal-readout {
+  font-size: 0.62rem;
+}
+
+body[data-device="mobile"] .post-login-cutscene {
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto;
+  gap: 10px;
+  padding: 12px;
+  clip-path: none;
+  overflow: hidden;
+}
+
+body[data-device="mobile"] .cutscene-phase {
+  min-height: 56vh;
+}
+
+body[data-device="mobile"] .phase-copy {
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  width: auto;
+}
+
+body[data-device="mobile"] .phase-copy h2 {
+  font-size: clamp(1.35rem, 8vw, 2.15rem);
+}
+
+body[data-device="mobile"] .loading-sidebar {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: end;
+  padding: 12px;
+  gap: 8px;
+}
+
+body[data-device="mobile"] .tip-box {
+  min-height: auto;
+  padding: 10px;
+}
+
+body[data-device="mobile"] .welcome-defender {
+  margin-top: 4px;
+}

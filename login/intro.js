@@ -74,11 +74,11 @@ export async function runIntro() {
   const intro = document.getElementById("intro");
   const output = document.getElementById("introOutput");
   const lines = [
-    "[NATO-BLACKLINE] waking post-ash cyber command lattice...",
-    "[SATCOM] tracking nuclear winter cloud cover over dead zones...",
-    "[AI-SENTINEL] checking ghost-ledger clearance before alarms wake...",
-    "[QUANTUM-FIREWALL] rotating cipher gates // hostile packets nearby...",
-    "[STRIKE-NET] routing through Sector 204 bunker relay...",
+    "[ARCHIVE] recovering final-war telemetry from dead satellites...",
+    "[ASHFALL] polar bomber tracks detected over blacked-out continents...",
+    "[IMPACT] nuclear exchange confirmed // old command net collapsed...",
+    "[BUNKER] Sector 204 firewall alive under the fallout layer...",
+    "[AI-SENTINEL] listening for unauthorized breath on the cyber-grid...",
     "[CLEARANCE] dark access window open // authenticate before trace"
   ];
 
@@ -96,9 +96,9 @@ export async function runIntro() {
 
     row.append(prefix, text, document.createTextNode("\n"));
     output.appendChild(row);
-    await new Promise((resolve) => setTimeout(resolve, 620));
+    await new Promise((resolve) => setTimeout(resolve, 820));
   }
 
-  await new Promise((resolve) => setTimeout(resolve, 700));
+  await new Promise((resolve) => setTimeout(resolve, 1100));
   intro.classList.add("hidden");
 }

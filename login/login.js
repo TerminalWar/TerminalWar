@@ -16,6 +16,7 @@ const authPanel = document.getElementById("authPanel");
 const postLoginCutscene = document.getElementById("postLoginCutscene");
 const introPanel = document.getElementById("intro");
 const subtitle = document.getElementById("subtitle");
+const gameplayTip = document.getElementById("gameplayTip");
 
 function configureViewportMode() {
   const width = window.innerWidth;
@@ -34,6 +35,13 @@ function configureViewportMode() {
 configureViewportMode();
 window.addEventListener("resize", configureViewportMode, { passive: true });
 
+const gameplayTips = [
+  "Keep your signal quiet. Loud commands wake stronger countermeasures.",
+  "Recon first: every dead node can still hide a live trace.",
+  "If the grid starts hunting you, break line-of-sight and reroute.",
+  "Salvage data before credits. In Sector 204, intel buys survival."
+];
+
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -47,9 +55,9 @@ async function enterGameWithCutscene() {
   introPanel.classList.add("hidden");
   postLoginCutscene.classList.remove("hidden");
   document.body.dataset.sequence = "handoff";
+  gameplayTip.textContent = gameplayTips[Math.floor(Math.random() * gameplayTips.length)];
 
-  const isLowPower = document.body.dataset.performance === "low";
-  await wait(isLowPower ? 5200 : 6400);
+  await wait(30000);
   goToGame();
 }
 

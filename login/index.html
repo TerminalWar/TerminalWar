@@ -34,10 +34,20 @@
         <div class="corner corner-tl"></div>
         <div class="corner corner-br"></div>
         <div class="panel-kicker">NATO BLACKLINE // TERMINALWAR</div>
-        <h2>CLASSIFIED CYBERWAR BOOT SEQUENCE</h2>
-        <div class="boot-grid" aria-hidden="true">
-          <span></span><span></span><span></span><span></span><span></span><span></span>
+        <div class="intro-cinematic" aria-hidden="true">
+          <div class="cinema-map">
+            <span class="continent continent-west"></span>
+            <span class="continent continent-east"></span>
+            <span class="cinema-bomber bomber-alpha"></span>
+            <span class="cinema-bomber bomber-bravo"></span>
+            <span class="impact-ring impact-one"></span>
+            <span class="impact-ring impact-two"></span>
+            <span class="fallout-front"></span>
+          </div>
+          <div class="cinema-warning">DEADNET ARCHIVE // FINAL WAR RECORD</div>
         </div>
+        <h2>ASHFALL ACCESS PROTOCOL</h2>
+        <p class="intro-lore">The old internet died under orbital fire. Sector 204 is one of the last encrypted bunkers still breathing.</p>
         <pre id="introOutput"></pre>
         <div class="loading-track" aria-hidden="true"><span></span></div>
       </section>
@@ -102,31 +112,55 @@
 
       <section id="postLoginCutscene" class="post-login-cutscene hidden" aria-live="polite">
         <div class="cutscene-frame" aria-hidden="true"></div>
-        <div class="holo-map" aria-hidden="true">
-          <div class="holo-earth"></div>
-          <span class="blast blast-one"></span>
-          <span class="blast blast-two"></span>
-          <span class="blast blast-three"></span>
-          <svg class="war-paths" viewBox="0 0 1000 620" preserveAspectRatio="none">
-            <path class="path-one" d="M90 420 C250 270 360 290 520 190 S760 100 920 220" />
-            <path class="path-two" d="M160 180 C330 260 410 440 640 390 S810 350 930 500" />
-            <path class="path-three" d="M88 520 C260 490 390 380 505 315 S690 238 875 284" />
-          </svg>
-          <div class="holo-warship">
-            <svg viewBox="0 0 260 150">
-              <path d="M25 92h146l31-21 35 2-25 34H54z" />
-              <path d="M86 67h67l13 25H68z" />
-              <path d="M118 23h32l17 44h-65z" />
-              <path d="M133 4v28M111 14h50M151 32l42 22" />
+        <div class="cutscene-phase phase-map" aria-hidden="true">
+          <div class="russia-map">
+            <span class="map-scan"></span>
+            <span class="russia-landmass"></span>
+            <span class="bomber bomber-one"></span>
+            <span class="bomber bomber-two"></span>
+            <span class="bomber bomber-three"></span>
+            <span class="target-ping target-moscow"></span>
+            <span class="target-ping target-ural"></span>
+            <span class="target-ping target-siberia"></span>
+            <svg class="bomber-routes" viewBox="0 0 1000 540" preserveAspectRatio="none">
+              <path d="M40 155 C250 110 420 168 620 118 S840 105 970 150" />
+              <path d="M80 290 C270 230 420 286 585 250 S785 245 930 322" />
+              <path d="M20 405 C210 362 455 420 620 370 S815 355 980 425" />
             </svg>
           </div>
+          <div class="phase-copy map-copy">
+            <p class="panel-kicker">BLACKLINE ARCHIVE // DAY ZERO</p>
+            <h2>AMERICAN BOMBERS CROSSED THE POLAR DARK.</h2>
+            <p>Red pings mark where the first strategic payloads broke the old world and forced every surviving army into the cyber-grid.</p>
+          </div>
         </div>
-        <div class="cutscene-copy">
-          <p class="panel-kicker">Post-nuclear command handoff // Sector 204</p>
-          <h2>THE OLD WORLD BURNED. THE GRID STILL FIGHTS.</h2>
-          <p>Orbital ash clouds detected. Blackline fleet surviving. Cyber-defense authority transferring to your terminal.</p>
+
+        <div class="cutscene-phase phase-ground" aria-hidden="true">
+          <div class="topography-field">
+            <span class="terrain-line terrain-one"></span>
+            <span class="terrain-line terrain-two"></span>
+            <span class="terrain-line terrain-three"></span>
+            <span class="nuke-bomber"></span>
+            <span class="falling-nuke"></span>
+            <span class="mushroom-cloud"></span>
+          </div>
+          <div class="phase-copy ground-copy">
+            <p class="panel-kicker">SURVIVAL NET // SECTOR 204</p>
+            <h2>WHEN THE SKY TURNED WHITE, THE WAR MOVED UNDERGROUND.</h2>
+            <p>You are entering a bunker network built from stolen satellites, dead cities, and machines that forgot how to surrender.</p>
+          </div>
+        </div>
+
+        <aside class="loading-sidebar">
+          <div class="asset-status">DOWNLOADING WARGRID ASSETS</div>
+          <div class="asset-bar" aria-hidden="true"><span></span></div>
+          <div class="asset-percent">SECURE HANDOFF // 30 SEC</div>
+          <div class="tip-box">
+            <span>FIELD TIP</span>
+            <p id="gameplayTip">Keep your signal quiet. Loud commands wake stronger countermeasures.</p>
+          </div>
           <strong class="welcome-defender">WELCOME, CYBER DEFENDER</strong>
-        </div>
+        </aside>
       </section>
 
       <aside class="threat-column right-column" aria-hidden="true">
