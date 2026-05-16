@@ -2,49 +2,186 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TerminalWar :: Sector 204 Access</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+    <title>TerminalWar :: NATO Blackline Command</title>
+    <script>
+      (() => {
+        const width = window.innerWidth;
+        const coarse = window.matchMedia("(pointer: coarse)").matches;
+        const memory = navigator.deviceMemory || 8;
+        const cores = navigator.hardwareConcurrency || 8;
+        const mobile = width <= 760;
+        const tablet = !mobile && (width <= 1180 || coarse);
+        const low = mobile || tablet || memory <= 4 || cores <= 4;
+        document.documentElement.dataset.device = mobile ? "mobile" : tablet ? "tablet" : "desktop";
+        document.documentElement.dataset.performance = low ? "low" : "high";
+        document.documentElement.style.setProperty("--app-vh", `${window.innerHeight * 0.01}px`);
+      })();
+    </script>
     <link rel="stylesheet" href="./login.css" />
   </head>
   <body>
     <canvas id="matrixCanvas" aria-hidden="true"></canvas>
-    <div class="hud-overlay" aria-hidden="true"></div>
+    <div class="starfield" aria-hidden="true"></div>
+    <div class="hud-overlay" aria-hidden="true">
+      <div class="scan-beam"></div>
+      <div class="orbital-ring ring-one"></div>
+      <div class="orbital-ring ring-two"></div>
+      <svg class="tactical-svg" viewBox="0 0 1200 800" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M40 190 L228 190 L285 136 L474 136" />
+        <path d="M775 90 L1000 90 L1160 218" />
+        <path d="M76 650 L294 650 L356 704 L582 704" />
+        <path d="M790 705 L914 598 L1156 598" />
+        <path class="hotline" d="M170 388 L390 284 L608 324 L834 236 L1044 318" />
+      </svg>
+    </div>
 
     <main class="screen">
+      <aside class="threat-column left-column" aria-hidden="true">
+        <span>ORBITAL WATCH</span>
+        <strong>DEFCON CYBER</strong>
+        <small>satellite uplink // encrypted</small>
+      </aside>
+
       <section id="intro" class="panel intro-panel">
-        <h2>BLACKSITE ACCESS PROTOCOL</h2>
+        <div class="panel-frame" aria-hidden="true"></div>
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-br"></div>
+        <div class="panel-kicker">NATO BLACKLINE // TERMINALWAR</div>
+        <div class="intro-cinematic" aria-hidden="true">
+          <div class="cinema-map">
+            <span class="continent continent-west"></span>
+            <span class="continent continent-east"></span>
+            <span class="cinema-bomber bomber-alpha"></span>
+            <span class="cinema-bomber bomber-bravo"></span>
+            <span class="impact-ring impact-one"></span>
+            <span class="impact-ring impact-two"></span>
+            <span class="fallout-front"></span>
+          </div>
+          <div class="cinema-warning">DEADNET ARCHIVE // FINAL WAR RECORD</div>
+        </div>
+        <h2>ASHFALL ACCESS PROTOCOL</h2>
+        <p class="intro-lore">The old internet died under orbital fire. Sector 204 is one of the last encrypted bunkers still breathing.</p>
         <pre id="introOutput"></pre>
+        <div class="loading-track" aria-hidden="true"><span></span></div>
       </section>
 
-      <section id="authPanel" class="panel hidden">
-        <div class="avatar-wrap"><div class="avatar-core">◉</div></div>
-        <h1>ACCESS TERMINAL</h1>
-        <p id="subtitle" class="subtitle">Welcome to Sector 204</p>
+      <section id="authPanel" class="panel auth-panel hidden">
+        <div class="panel-frame" aria-hidden="true"></div>
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-br"></div>
+        <div class="classified-ribbon">FILE SYSTEM // CYBER-GRID 2050</div>
 
-        <div class="field hidden">
-          <label for="username">Neural_ID</label>
-          <input id="username" type="text" autocomplete="username" placeholder="ghostrunner_7" />
+        <div class="auth-grid">
+          <div class="identity-stack">
+            <div class="avatar-wrap" aria-hidden="true">
+              <div class="avatar-hex">
+                <svg class="warship-hologram" viewBox="0 0 160 110" role="img" aria-label="Holographic warship silhouette">
+                  <path class="ship-hull" d="M18 69h84l17-13 23 1-14 20H36z" />
+                  <path class="ship-deck" d="M55 54h39l8 15H43z" />
+                  <path class="ship-tower" d="M74 25h18l8 29H65z" />
+                  <path class="ship-mast" d="M82 9v19M70 17h28M91 28l22 12" />
+                  <path class="ship-scan" d="M24 86c28 8 84 8 112-1" />
+                </svg>
+              </div>
+            </div>
+            <div class="signal-readout">
+              <span class="pulse-dot"></span>
+              <span>AI SENTINEL ONLINE</span>
+            </div>
+          </div>
+
+          <div class="auth-content">
+            <p class="panel-kicker">TerminalWar // Blacksite Sector 204</p>
+            <h1>STRATEGIC ACCESS GATE</h1>
+            <p id="subtitle" class="subtitle">Unauthorized presence detected. Prove clearance before the grid notices.</p>
+
+            <div class="field hidden">
+              <label for="username">Operator Callsign</label>
+              <input id="username" type="text" autocomplete="username" placeholder="RAVEN-VECTOR-07" />
+            </div>
+
+            <div class="field">
+              <label for="email">Encrypted Command Channel</label>
+              <input id="email" type="email" autocomplete="email" placeholder="operator@blackline.grid" />
+            </div>
+
+            <div class="field">
+              <label for="password">Quantum Cipher Key</label>
+              <input id="password" type="password" autocomplete="current-password" placeholder="••••••••••••" />
+            </div>
+
+            <div class="actions">
+              <button id="loginBtn">Authorize Operator</button>
+              <button id="signupBtn" class="hidden">Enroll Asset</button>
+            </div>
+
+            <button id="switchModeBtn" class="ghost-btn" type="button">Request New Blackline Callsign</button>
+            <button id="forceLogoutBtn" class="ghost-btn danger" type="button">Purge Local Session</button>
+            <p id="status" role="status" aria-live="polite"></p>
+          </div>
         </div>
-
-        <div class="field">
-          <label for="email">Signal_Email</label>
-          <input id="email" type="email" autocomplete="email" placeholder="operator@grid.net" />
-        </div>
-
-        <div class="field">
-          <label for="password">Decrypt_Key</label>
-          <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" />
-        </div>
-
-        <div class="actions">
-          <button id="loginBtn">Log In</button>
-          <button id="signupBtn" class="hidden">Create Account</button>
-        </div>
-
-        <button id="switchModeBtn" class="ghost-btn" type="button">Need a Neural_ID? Sign Up</button>
-        <button id="forceLogoutBtn" class="ghost-btn" type="button">Force Logout (testing)</button>
-        <p id="status" role="status" aria-live="polite"></p>
       </section>
+
+
+      <section id="postLoginCutscene" class="post-login-cutscene hidden" aria-live="polite">
+        <div class="cutscene-frame" aria-hidden="true"></div>
+        <div class="cutscene-phase phase-map" aria-hidden="true">
+          <div class="russia-map">
+            <span class="map-scan"></span>
+            <span class="russia-landmass"></span>
+            <span class="bomber bomber-one"></span>
+            <span class="bomber bomber-two"></span>
+            <span class="bomber bomber-three"></span>
+            <span class="target-ping target-moscow"></span>
+            <span class="target-ping target-ural"></span>
+            <span class="target-ping target-siberia"></span>
+            <svg class="bomber-routes" viewBox="0 0 1000 540" preserveAspectRatio="none">
+              <path d="M40 155 C250 110 420 168 620 118 S840 105 970 150" />
+              <path d="M80 290 C270 230 420 286 585 250 S785 245 930 322" />
+              <path d="M20 405 C210 362 455 420 620 370 S815 355 980 425" />
+            </svg>
+          </div>
+          <div class="phase-copy map-copy">
+            <p class="panel-kicker">BLACKLINE ARCHIVE // DAY ZERO</p>
+            <h2>AMERICAN BOMBERS CROSSED THE POLAR DARK.</h2>
+            <p>Red pings mark where the first strategic payloads broke the old world and forced every surviving army into the cyber-grid.</p>
+          </div>
+        </div>
+
+        <div class="cutscene-phase phase-ground" aria-hidden="true">
+          <div class="topography-field">
+            <span class="terrain-line terrain-one"></span>
+            <span class="terrain-line terrain-two"></span>
+            <span class="terrain-line terrain-three"></span>
+            <span class="nuke-bomber"></span>
+            <span class="falling-nuke"></span>
+            <span class="mushroom-cloud"></span>
+          </div>
+          <div class="phase-copy ground-copy">
+            <p class="panel-kicker">SURVIVAL NET // SECTOR 204</p>
+            <h2>WHEN THE SKY TURNED WHITE, THE WAR MOVED UNDERGROUND.</h2>
+            <p>You are entering a bunker network built from stolen satellites, dead cities, and machines that forgot how to surrender.</p>
+          </div>
+        </div>
+
+        <aside class="loading-sidebar">
+          <div class="asset-status">DOWNLOADING WARGRID ASSETS</div>
+          <div class="asset-bar" aria-hidden="true"><span></span></div>
+          <div class="asset-percent">SECURE HANDOFF // 30 SEC</div>
+          <div class="tip-box">
+            <span>FIELD TIP</span>
+            <p id="gameplayTip">Keep your signal quiet. Loud commands wake stronger countermeasures.</p>
+          </div>
+          <strong class="welcome-defender">WELCOME, CYBER DEFENDER</strong>
+        </aside>
+      </section>
+
+      <aside class="threat-column right-column" aria-hidden="true">
+        <span>GLOBAL BATTLESPACE</span>
+        <strong>17 ACTIVE ZONES</strong>
+        <small>drone mesh // signal contested</small>
+      </aside>
     </main>
 
     <script type="module" src="./login.js"></script>
