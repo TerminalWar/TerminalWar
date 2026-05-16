@@ -1496,3 +1496,316 @@ body[data-device="mobile"] .tip-box {
 body[data-device="mobile"] .welcome-defender {
   margin-top: 4px;
 }
+
+/* bugfix pass: readable mobile shell, real aircraft silhouettes, clearer bomb drop */
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
+/* Keep the side intel as atmosphere on desktop, never as bottom content on phones. */
+html[data-device="mobile"] .threat-column,
+body[data-device="mobile"] .threat-column {
+  display: none !important;
+}
+
+@media (max-width: 760px), (pointer: coarse) {
+  .threat-column {
+    display: none !important;
+  }
+}
+
+/* The auth shell should keep beveled/glass military geometry on mobile too. */
+html[data-device="mobile"] .panel,
+body[data-device="mobile"] .panel,
+html[data-device="mobile"] .auth-panel,
+body[data-device="mobile"] .auth-panel {
+  width: min(94vw, 440px);
+  max-height: calc(var(--app-vh, 1vh) * 96);
+  overflow: hidden auto;
+  padding: 18px 14px 20px;
+  background:
+    linear-gradient(145deg, rgba(69, 255, 209, 0.14), transparent 20%),
+    linear-gradient(315deg, rgba(255, 67, 104, 0.08), transparent 22%),
+    linear-gradient(180deg, rgba(8, 24, 42, 0.96), rgba(1, 5, 12, 0.98));
+  border: 1px solid rgba(69, 255, 209, 0.5);
+  box-shadow: 0 0 34px rgba(69, 255, 209, 0.14), inset 0 0 30px rgba(115, 247, 255, 0.1);
+  clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%, 0 22px);
+}
+
+html[data-device="mobile"] .panel::before,
+body[data-device="mobile"] .panel::before {
+  inset: 8px;
+  border-color: rgba(69, 255, 209, 0.24);
+  clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%, 0 18px);
+}
+
+html[data-device="mobile"] h1,
+body[data-device="mobile"] h1 {
+  font-size: clamp(1.45rem, 7vw, 2.15rem);
+  line-height: 1;
+}
+
+html[data-device="mobile"] .subtitle,
+body[data-device="mobile"] .subtitle,
+html[data-device="mobile"] #status,
+body[data-device="mobile"] #status {
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+html[data-device="mobile"] label,
+body[data-device="mobile"] label {
+  font-size: 0.68rem;
+}
+
+html[data-device="mobile"] input,
+body[data-device="mobile"] input,
+html[data-device="mobile"] button,
+body[data-device="mobile"] button {
+  font-size: 0.85rem;
+  min-height: 48px;
+}
+
+html[data-device="mobile"] .avatar-wrap,
+body[data-device="mobile"] .avatar-wrap {
+  width: 96px;
+  height: 96px;
+}
+
+html[data-device="mobile"] .avatar-hex,
+body[data-device="mobile"] .avatar-hex {
+  width: 76px;
+  height: 76px;
+}
+
+/* Flip the sentinel hologram so the bow faces the requested direction. */
+.warship-hologram {
+  transform-origin: center;
+  animation: shipFloatFacingLeft 4.8s ease-in-out infinite;
+}
+
+/* Replace missile-looking glyphs with a bomber silhouette: fuselage, wings, tail. */
+.cinema-bomber,
+.bomber,
+.nuke-bomber {
+  background: none !important;
+  clip-path: none !important;
+  border-radius: 0;
+  filter: drop-shadow(0 0 12px rgba(115, 247, 255, 0.8));
+}
+
+.cinema-bomber::before,
+.bomber::before,
+.nuke-bomber::before {
+  content: "";
+  position: absolute;
+  inset: 32% 2% 32% 2%;
+  background: linear-gradient(90deg, #dffcff, #73f7ff 45%, #bffcff);
+  clip-path: polygon(0 35%, 72% 35%, 100% 50%, 72% 65%, 0 65%, 10% 50%);
+}
+
+.cinema-bomber::after,
+.bomber::after,
+.nuke-bomber::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(115, 247, 255, 0.72);
+  clip-path: polygon(22% 45%, 48% 0, 61% 0, 52% 45%, 90% 48%, 90% 52%, 52% 55%, 61% 100%, 48% 100%, 22% 55%, 0 66%, 0 34%);
+}
+
+.nuke-bomber {
+  width: 190px;
+  height: 92px;
+}
+
+/* Make the nuclear payload read as a falling bomb, not a stick or growing lollipop. */
+.falling-nuke {
+  width: 20px;
+  height: 58px;
+  background: none;
+  filter: drop-shadow(0 0 14px rgba(115, 247, 255, 0.92));
+}
+
+.falling-nuke::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #e8fbff, #73f7ff 55%, #2c6dff);
+  clip-path: polygon(50% 0, 82% 13%, 70% 78%, 100% 100%, 62% 88%, 38% 88%, 0 100%, 30% 78%, 18% 13%);
+}
+
+.falling-nuke::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -22px;
+  width: 1px;
+  height: 28px;
+  background: linear-gradient(180deg, transparent, rgba(115, 247, 255, 0.85));
+}
+
+.mushroom-cloud {
+  width: 150px;
+  height: 160px;
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(232, 251, 255, 0.92) 0 20%, rgba(115, 247, 255, 0.34) 21% 37%, transparent 39%),
+    radial-gradient(ellipse at 28% 34%, rgba(115, 247, 255, 0.42), transparent 32%),
+    radial-gradient(ellipse at 72% 36%, rgba(115, 247, 255, 0.36), transparent 34%),
+    radial-gradient(ellipse at 50% 56%, rgba(255, 67, 104, 0.18), transparent 36%),
+    linear-gradient(90deg, transparent 38%, rgba(115, 247, 255, 0.42) 44% 56%, transparent 62%);
+  transform-origin: 50% 100%;
+}
+
+@keyframes nukeDrop {
+  0%, 28% { opacity: 0; transform: translate3d(-26px, -76px, 0) rotate(8deg) scale(0.82); }
+  38% { opacity: 1; }
+  78% { opacity: 1; transform: translate3d(28px, 235px, 0) rotate(8deg) scale(1); }
+  100% { opacity: 0; transform: translate3d(40px, 270px, 0) rotate(8deg) scale(0.92); }
+}
+
+@keyframes mushroomBloom {
+  0%, 56% { opacity: 0; transform: scale(0.25) translateY(42px); }
+  68% { opacity: 1; transform: scale(0.85) translateY(0); }
+  100% { opacity: 0.2; transform: scale(1.75) translateY(-52px); }
+}
+
+@keyframes shipFloatFacingLeft {
+  0%, 100% { transform: scaleX(-1) translateY(0) skewX(-2deg); opacity: 0.78; }
+  50% { transform: scaleX(-1) translateY(-7px) skewX(-2deg); opacity: 1; }
+}
+
+/* Phone layout is its own compact interface, not a shrunken desktop. */
+@media (max-width: 760px), (pointer: coarse) and (max-width: 900px) {
+  html,
+  body {
+    min-height: calc(var(--app-vh, 1vh) * 100);
+    overflow: hidden;
+  }
+
+  .hud-overlay {
+    opacity: 0.72;
+  }
+
+  .orbital-ring,
+  .right-column,
+  .left-column {
+    display: none !important;
+  }
+
+  .screen {
+    min-height: calc(var(--app-vh, 1vh) * 100);
+    height: calc(var(--app-vh, 1vh) * 100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    overflow: hidden;
+  }
+
+  .intro-panel,
+  .auth-panel {
+    max-height: calc(var(--app-vh, 1vh) * 94);
+  }
+
+  .intro-panel h2 {
+    font-size: clamp(1.45rem, 8vw, 2.4rem);
+  }
+
+  .intro-cinematic {
+    height: min(190px, 28vh);
+    margin: 12px 0;
+  }
+
+  #introOutput {
+    min-height: 120px;
+    max-height: 22vh;
+    overflow: hidden;
+    font-size: clamp(0.64rem, 2.7vw, 0.76rem);
+  }
+
+  .auth-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .identity-stack {
+    border: 0;
+    border-bottom: 1px solid rgba(69, 255, 209, 0.2);
+    padding: 0 0 12px;
+  }
+
+  .classified-ribbon {
+    margin-bottom: 12px;
+  }
+
+  .field {
+    margin-bottom: 9px;
+  }
+
+  .actions {
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .ghost-btn {
+    margin-top: 8px;
+  }
+
+  .post-login-cutscene {
+    height: calc(var(--app-vh, 1vh) * 100);
+    max-height: calc(var(--app-vh, 1vh) * 100);
+  }
+
+  .cutscene-phase {
+    min-height: 0;
+    height: calc((var(--app-vh, 1vh) * 100) - 190px);
+  }
+
+  .phase-copy {
+    padding: 10px;
+    background: rgba(1, 7, 14, 0.68);
+    border: 1px solid rgba(115, 247, 255, 0.18);
+  }
+
+  .phase-copy h2 {
+    font-size: clamp(1.15rem, 6vw, 1.8rem);
+    line-height: 1;
+  }
+
+  .phase-copy p:not(.panel-kicker) {
+    font-size: 0.78rem;
+    line-height: 1.4;
+  }
+
+  .loading-sidebar {
+    max-height: 178px;
+  }
+
+  .asset-status,
+  .asset-percent,
+  .tip-box span {
+    font-size: 0.62rem;
+  }
+
+  .tip-box p {
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
+
+  .nuke-bomber {
+    width: 118px;
+    height: 58px;
+  }
+
+  .mushroom-cloud {
+    left: 38%;
+    width: 96px;
+    height: 110px;
+  }
+}

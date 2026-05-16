@@ -23,12 +23,17 @@ function configureViewportMode() {
   const hasTouch = window.matchMedia("(pointer: coarse)").matches;
   const deviceMemory = navigator.deviceMemory || 8;
   const cpuCores = navigator.hardwareConcurrency || 8;
-  const isMobile = width <= 640;
+  const isMobile = width <= 760;
   const isTablet = !isMobile && (width <= 1180 || hasTouch);
   const isLowPower = isMobile || isTablet || deviceMemory <= 4 || cpuCores <= 4;
 
-  document.body.dataset.device = isMobile ? "mobile" : isTablet ? "tablet" : "desktop";
-  document.body.dataset.performance = isLowPower ? "low" : "high";
+  const device = isMobile ? "mobile" : isTablet ? "tablet" : "desktop";
+  const performance = isLowPower ? "low" : "high";
+
+  document.documentElement.dataset.device = device;
+  document.documentElement.dataset.performance = performance;
+  document.body.dataset.device = device;
+  document.body.dataset.performance = performance;
   document.documentElement.style.setProperty("--app-vh", `${window.innerHeight * 0.01}px`);
 }
 
