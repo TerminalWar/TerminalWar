@@ -3,19 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Terminal War 2050 // Wasteland OS</title>
+    <title>AACR Blacksite // Desktop</title>
     <link rel="stylesheet" href="/game/styles/desktop.css" />
     <link rel="stylesheet" href="/game/styles/windows.css" />
   </head>
   <body>
-    <main id="gameShell" class="os-shell" aria-label="Terminal War 2050 game desktop">
-      <section id="desktop" class="desktop" aria-label="Wasteland OS desktop"></section>
+    <main id="gameShell" class="os-shell" aria-label="AACR Blacksite game desktop">
+      <section id="desktop" class="desktop" aria-label="AACR OS desktop"></section>
 
       <section id="startMenu" class="start-menu" aria-label="Installed apps" hidden></section>
       <section id="clockPanel" class="clock-panel" aria-label="System time and session controls" hidden></section>
 
       <nav id="taskbar" class="taskbar" aria-label="Game desktop taskbar"></nav>
     </main>
+    <section id="mobileBlocker" class="mobile-blocker" hidden aria-live="assertive">
+      <div class="mobile-blocker-card">
+        <p class="eyebrow">AACR DESKTOP SECURITY</p>
+        <h1>Mobile not supported</h1>
+        <p>Terminal War 2050 is a laptop/PC-only desktop game. Reconnect from a keyboard, mouse, and full browser workstation.</p>
+      </div>
+    </section>
     <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
     <script type="module" src="/game/main.js"></script>
   </body>

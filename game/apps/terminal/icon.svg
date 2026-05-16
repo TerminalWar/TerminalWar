@@ -1,11 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 124 124" role="img" aria-label="terminal icon">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="terminal app icon">
   <defs>
-    <linearGradient id="g" x1="16" y1="12" x2="108" y2="112" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#39ff14"/>
-      <stop offset="1" stop-color="#07111f"/>
-    </linearGradient>
-    <filter id="glow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#202734"/><stop offset=".45" stop-color="#05070c"/><stop offset="1" stop-color="#323946"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   </defs>
-  <rect x="10" y="10" width="104" height="104" rx="28" fill="url(#g)" opacity=".96"/>
-  <path d="M18 24h92v72H18z M32 44l14 14-14 14 M56 74h28" fill="none" stroke="#f5fbff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+  <path d="M14 5h52l16 16v56L66 91H14L4 79V17z" fill="url(#metal)" stroke="#39ff14" stroke-width="2.5"/>
+  <path d="M22 14h38l12 12v42L60 80H22L14 70V24z" fill="#03060b" stroke="#39ff14" stroke-opacity=".35"/>
+  <path d="M10 20h76v56H10z M22 34l14 12-14 12 M42 58h24" fill="none" stroke="#39ff14" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+  <text x="48" y="59" fill="#39ff14" font-family="monospace" font-weight="900" font-size="26" text-anchor="middle" opacity=".18">></text>
 </svg>

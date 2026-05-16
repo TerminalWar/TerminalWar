@@ -11,6 +11,15 @@ export function initWindowManager({ desktop, onWindowsChanged }) {
   taskbarRefresh = onWindowsChanged;
 }
 
+async function saveRouteToDatastore(path) {
+  try {
+    const { savePlayerRoute } = await import("./playerStore.js");
+    await savePlayerRoute(desktopState.user, path);
+  } catch (error) {
+    console.warn("Route datastore sync failed", error);
+  }
+}
+
 function setActiveWindow(windowId) {
   desktopState.activeWindowId = windowId;
   for (const [id, record] of desktopState.openWindows) {
@@ -55,6 +64,10 @@ function makeDraggable(windowEl, handle) {
   });
 }
 
+function stopWindowControlEvent(event) {
+  event.stopPropagation();
+}
+
 function closeWindow(windowId) {
   const record = desktopState.openWindows.get(windowId);
   if (!record) return;
@@ -65,6 +78,7 @@ function closeWindow(windowId) {
   }
   if (desktopState.openWindows.size === 0 && window.location.pathname !== "/game/") {
     window.history.pushState({}, "", "/game/");
+    saveRouteToDatastore("/game/");
   }
   taskbarRefresh?.();
 }
@@ -74,12 +88,19 @@ function toggleMaximize(windowEl) {
   setActiveWindow(windowEl.dataset.windowId);
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
 export async function openAppWindow(appConfig, { updateRoute = true } = {}) {
   const existing = Array.from(desktopState.openWindows.values()).find((record) => record.app.id === appConfig.id);
   if (existing) {
     existing.element.hidden = false;
     setActiveWindow(existing.id);
-    if (updateRoute) routeToApp(appConfig);
+    if (updateRoute) {
+      routeToApp(appConfig);
+      saveRouteToDatastore(`/game/${appConfig.slug}/`);
+    }
     return existing;
   }
 
@@ -97,6 +118,11 @@ export async function openAppWindow(appConfig, { updateRoute = true } = {}) {
   windowEl.style.top = `${Math.min(54 + offset, window.innerHeight - 340)}px`;
   windowEl.style.setProperty("--app-accent", appConfig.accent);
   windowEl.innerHTML = `
+    <div class="app-launch-loader" aria-hidden="true">
+      <div class="loader-core"><span></span><span></span><span></span></div>
+      <strong>AACR loading ${appConfig.shortName}</strong>
+      <small>decrypting app shell // syncing blacksite permissions</small>
+    </div>
     <header class="window-titlebar">
       <div class="window-title">
         <img src="${appConfig.icon}" alt="" />
@@ -116,25 +142,41 @@ export async function openAppWindow(appConfig, { updateRoute = true } = {}) {
   makeDraggable(windowEl, titlebar);
 
   windowEl.addEventListener("pointerdown", () => setActiveWindow(windowId));
-  windowEl.querySelector('[data-action="close"]').addEventListener("click", () => closeWindow(windowId));
-  windowEl.querySelector('[data-action="minimize"]').addEventListener("click", () => {
+  const controls = windowEl.querySelector(".window-controls");
+  controls.addEventListener("pointerdown", stopWindowControlEvent);
+  controls.addEventListener("click", stopWindowControlEvent);
+  windowEl.querySelector('[data-action="close"]').addEventListener("click", (event) => {
+    stopWindowControlEvent(event);
+    closeWindow(windowId);
+  });
+  windowEl.querySelector('[data-action="minimize"]').addEventListener("click", (event) => {
+    stopWindowControlEvent(event);
     windowEl.hidden = true;
     taskbarRefresh?.();
   });
-  windowEl.querySelector('[data-action="maximize"]').addEventListener("click", () => toggleMaximize(windowEl));
+  windowEl.querySelector('[data-action="maximize"]').addEventListener("click", (event) => {
+    stopWindowControlEvent(event);
+    toggleMaximize(windowEl);
+  });
 
   desktopElement.append(windowEl);
   desktopState.openWindows.set(windowId, { id: windowId, app: appConfig, element: windowEl });
   setActiveWindow(windowId);
 
   try {
+    await sleep(UI_CONFIG.windows.launchDelayMs || 3000);
+    if (!desktopState.openWindows.has(windowId)) return null;
+    windowEl.querySelector(".app-launch-loader")?.classList.add("is-complete");
     content.replaceChildren(await createAppContent(appConfig));
   } catch (error) {
     console.error(`Failed to load ${appConfig.id}`, error);
     content.innerHTML = `<div class="app-error">App failed to load. Check console for details.</div>`;
   }
 
-  if (updateRoute) routeToApp(appConfig);
+  if (updateRoute) {
+    routeToApp(appConfig);
+    saveRouteToDatastore(`/game/${appConfig.slug}/`);
+  }
   taskbarRefresh?.();
   return desktopState.openWindows.get(windowId);
 }
@@ -145,6 +187,7 @@ export function restoreWindow(windowId) {
   record.element.hidden = false;
   setActiveWindow(windowId);
   routeToApp(record.app);
+  saveRouteToDatastore(`/game/${record.app.slug}/`);
 }
 
 export function getOpenWindowRecords() {

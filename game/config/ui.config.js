@@ -1,14 +1,15 @@
 export const UI_CONFIG = {
   taskbar: {
     height: 64,
-    appButtonLabel: "TW",
+    appButtonLabel: "AACR",
     appButtonTitle: "Open installed apps",
     pinnedAppIds: ["files", "terminal", "shop", "settings"]
   },
   windows: {
     defaultSize: { width: 760, height: 500 },
     minSize: { width: 330, height: 240 },
-    cascadeOffset: 28
+    cascadeOffset: 28,
+    launchDelayMs: 3000
   },
   clock: {
     futureYear: 2050,
