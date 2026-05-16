@@ -3,48 +3,101 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TerminalWar :: Sector 204 Access</title>
+    <title>TerminalWar :: NATO Blackline Command</title>
     <link rel="stylesheet" href="./login.css" />
   </head>
   <body>
     <canvas id="matrixCanvas" aria-hidden="true"></canvas>
-    <div class="hud-overlay" aria-hidden="true"></div>
+    <div class="starfield" aria-hidden="true"></div>
+    <div class="hud-overlay" aria-hidden="true">
+      <div class="scan-beam"></div>
+      <div class="orbital-ring ring-one"></div>
+      <div class="orbital-ring ring-two"></div>
+      <svg class="tactical-svg" viewBox="0 0 1200 800" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M40 190 L228 190 L285 136 L474 136" />
+        <path d="M775 90 L1000 90 L1160 218" />
+        <path d="M76 650 L294 650 L356 704 L582 704" />
+        <path d="M790 705 L914 598 L1156 598" />
+        <path class="hotline" d="M170 388 L390 284 L608 324 L834 236 L1044 318" />
+      </svg>
+    </div>
 
     <main class="screen">
+      <aside class="threat-column left-column" aria-hidden="true">
+        <span>ORBITAL WATCH</span>
+        <strong>DEFCON CYBER</strong>
+        <small>satellite uplink // encrypted</small>
+      </aside>
+
       <section id="intro" class="panel intro-panel">
-        <h2>BLACKSITE ACCESS PROTOCOL</h2>
+        <div class="panel-frame" aria-hidden="true"></div>
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-br"></div>
+        <div class="panel-kicker">NATO BLACKLINE // TERMINALWAR</div>
+        <h2>CLASSIFIED CYBERWAR BOOT SEQUENCE</h2>
+        <div class="boot-grid" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
         <pre id="introOutput"></pre>
+        <div class="loading-track" aria-hidden="true"><span></span></div>
       </section>
 
-      <section id="authPanel" class="panel hidden">
-        <div class="avatar-wrap"><div class="avatar-core">◉</div></div>
-        <h1>ACCESS TERMINAL</h1>
-        <p id="subtitle" class="subtitle">Welcome to Sector 204</p>
+      <section id="authPanel" class="panel auth-panel hidden">
+        <div class="panel-frame" aria-hidden="true"></div>
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-br"></div>
+        <div class="classified-ribbon">TOP SECRET // EYES ONLY // 2050</div>
 
-        <div class="field hidden">
-          <label for="username">Neural_ID</label>
-          <input id="username" type="text" autocomplete="username" placeholder="ghostrunner_7" />
+        <div class="auth-grid">
+          <div class="identity-stack">
+            <div class="avatar-wrap" aria-hidden="true">
+              <div class="avatar-hex">
+                <div class="avatar-core">⌬</div>
+              </div>
+            </div>
+            <div class="signal-readout">
+              <span class="pulse-dot"></span>
+              <span>AI SENTINEL ONLINE</span>
+            </div>
+          </div>
+
+          <div class="auth-content">
+            <p class="panel-kicker">TerminalWar // Blacksite Sector 204</p>
+            <h1>STRATEGIC ACCESS GATE</h1>
+            <p id="subtitle" class="subtitle">Operator verification required for live cyber theater.</p>
+
+            <div class="field hidden">
+              <label for="username">Operator Callsign</label>
+              <input id="username" type="text" autocomplete="username" placeholder="RAVEN-VECTOR-07" />
+            </div>
+
+            <div class="field">
+              <label for="email">Encrypted Command Channel</label>
+              <input id="email" type="email" autocomplete="email" placeholder="operator@blackline.grid" />
+            </div>
+
+            <div class="field">
+              <label for="password">Quantum Cipher Key</label>
+              <input id="password" type="password" autocomplete="current-password" placeholder="••••••••••••" />
+            </div>
+
+            <div class="actions">
+              <button id="loginBtn">Authorize Operator</button>
+              <button id="signupBtn" class="hidden">Enroll Asset</button>
+            </div>
+
+            <button id="switchModeBtn" class="ghost-btn" type="button">Request New Blackline Callsign</button>
+            <button id="forceLogoutBtn" class="ghost-btn danger" type="button">Purge Local Session</button>
+            <p id="status" role="status" aria-live="polite"></p>
+          </div>
         </div>
-
-        <div class="field">
-          <label for="email">Signal_Email</label>
-          <input id="email" type="email" autocomplete="email" placeholder="operator@grid.net" />
-        </div>
-
-        <div class="field">
-          <label for="password">Decrypt_Key</label>
-          <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" />
-        </div>
-
-        <div class="actions">
-          <button id="loginBtn">Log In</button>
-          <button id="signupBtn" class="hidden">Create Account</button>
-        </div>
-
-        <button id="switchModeBtn" class="ghost-btn" type="button">Need a Neural_ID? Sign Up</button>
-        <button id="forceLogoutBtn" class="ghost-btn" type="button">Force Logout (testing)</button>
-        <p id="status" role="status" aria-live="polite"></p>
       </section>
+
+      <aside class="threat-column right-column" aria-hidden="true">
+        <span>GLOBAL BATTLESPACE</span>
+        <strong>17 ACTIVE ZONES</strong>
+        <small>drone mesh // signal contested</small>
+      </aside>
     </main>
 
     <script type="module" src="./login.js"></script>
