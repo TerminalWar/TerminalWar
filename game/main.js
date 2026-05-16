@@ -3,6 +3,7 @@ import {
   signOut
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import { auth } from "../shared/firebase.js";
+import { goToLogin } from "../shared/navigation.js";
 
 const textEl = document.getElementById("welcomeText");
 const logoutBtn = document.getElementById("logoutBtn");
@@ -15,7 +16,7 @@ logoutBtn.addEventListener("click", async () => {
   try {
     await signOut(auth);
     statusEl.textContent = "Signed out. Redirecting...";
-    window.location.href = "/login/?loggedOut=1";
+    goToLogin("?loggedOut=1");
   } catch (error) {
     console.error("Logout failed", error);
     statusEl.textContent = "Logout failed. Try again.";
@@ -25,7 +26,7 @@ logoutBtn.addEventListener("click", async () => {
 
 onAuthStateChanged(auth, (user) => {
   if (!user) {
-    window.location.href = "/login/";
+    goToLogin();
     return;
   }
 
