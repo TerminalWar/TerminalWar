@@ -795,3 +795,318 @@ body[data-device="mobile"] .tactical-svg,
 body[data-device="mobile"] .ring-one {
   opacity: 0.55;
 }
+
+/* polish pass: darker post-collapse tone, less desktop work, same cyber-grid silhouette */
+body {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(32, 70, 122, 0.28), transparent 30%),
+    radial-gradient(circle at 78% 8%, rgba(120, 20, 42, 0.16), transparent 26%),
+    radial-gradient(circle at 50% 86%, rgba(36, 150, 132, 0.09), transparent 32%),
+    linear-gradient(135deg, #010207 0%, #050b15 50%, #010207 100%);
+}
+
+body[data-performance="high"] #matrixCanvas {
+  opacity: 0.18;
+  filter: saturate(1.05);
+}
+
+body[data-performance="high"]::before { animation-duration: 74s; }
+body[data-performance="high"] .starfield { animation-duration: 38s; opacity: 0.2; }
+body[data-performance="high"] .ring-one { animation-duration: 54s; }
+body[data-performance="high"] .ring-two { animation-duration: 36s; }
+body[data-performance="high"] .tactical-svg path { animation-duration: 14s; }
+body[data-performance="high"] .scan-beam { animation-duration: 7.5s; }
+
+.screen {
+  grid-template-columns: 1fr;
+  place-items: center;
+}
+
+.threat-column {
+  position: fixed;
+  width: clamp(124px, 12vw, 170px);
+  min-height: 220px;
+  opacity: 0.68;
+  z-index: -1;
+}
+
+.left-column { left: clamp(12px, 2.4vw, 34px); }
+.right-column { right: clamp(12px, 2.4vw, 34px); }
+
+.classified-ribbon {
+  color: #02140f;
+  background: linear-gradient(90deg, #45ffd1, #b7ffea);
+  box-shadow: 0 0 18px rgba(69, 255, 209, 0.28);
+}
+
+.panel {
+  box-shadow:
+    0 22px 62px rgba(0, 0, 0, 0.68),
+    0 0 46px rgba(69, 255, 209, 0.1),
+    inset 0 0 32px rgba(115, 247, 255, 0.09);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.subtitle,
+.threat-column small,
+#status {
+  color: #7faabd;
+}
+
+.warship-hologram {
+  width: 112px;
+  height: 82px;
+  overflow: visible;
+  filter: drop-shadow(0 0 12px rgba(115, 247, 255, 0.58));
+  animation: shipFloat 4.8s ease-in-out infinite;
+}
+
+.warship-hologram path {
+  fill: rgba(115, 247, 255, 0.12);
+  stroke: #73f7ff;
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.warship-hologram .ship-scan {
+  fill: none;
+  stroke: rgba(69, 255, 209, 0.65);
+  stroke-dasharray: 8 10;
+  animation: dashMove 9s linear infinite;
+}
+
+.post-login-cutscene {
+  position: fixed;
+  inset: clamp(12px, 3vw, 34px);
+  z-index: 20;
+  display: grid;
+  grid-template-columns: minmax(300px, 1.35fr) minmax(260px, 0.85fr);
+  align-items: center;
+  gap: clamp(18px, 4vw, 44px);
+  padding: clamp(18px, 4vw, 48px);
+  color: var(--text);
+  background:
+    radial-gradient(circle at 32% 42%, rgba(57, 151, 255, 0.18), transparent 35%),
+    linear-gradient(145deg, rgba(4, 14, 28, 0.92), rgba(1, 4, 10, 0.96));
+  border: 1px solid rgba(115, 247, 255, 0.42);
+  clip-path: polygon(42px 0, 100% 0, 100% calc(100% - 58px), calc(100% - 58px) 100%, 0 100%, 0 42px);
+  box-shadow: 0 0 80px rgba(42, 139, 255, 0.16), inset 0 0 48px rgba(115, 247, 255, 0.1);
+  overflow: hidden;
+  animation: cutsceneIgnite 700ms ease both;
+}
+
+.post-login-cutscene::before,
+.post-login-cutscene::after,
+.cutscene-frame {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.post-login-cutscene::before {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 76px, rgba(115, 247, 255, 0.045) 77px 78px),
+    repeating-linear-gradient(0deg, transparent 0 62px, rgba(115, 247, 255, 0.035) 63px 64px);
+  animation: holoGridDrift 9s linear infinite;
+}
+
+.post-login-cutscene::after {
+  background: linear-gradient(100deg, transparent 0 42%, rgba(115, 247, 255, 0.14) 48%, transparent 54% 100%);
+  animation: glassSweep 4.4s ease-in-out infinite;
+}
+
+.cutscene-frame {
+  border: 1px solid rgba(115, 247, 255, 0.28);
+  inset: 14px;
+  clip-path: polygon(32px 0, 100% 0, 100% calc(100% - 42px), calc(100% - 42px) 100%, 0 100%, 0 32px);
+}
+
+.holo-map {
+  position: relative;
+  height: min(62vh, 520px);
+  min-height: 300px;
+  isolation: isolate;
+}
+
+.holo-earth {
+  position: absolute;
+  inset: 5% 2% 0 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 55%, transparent 0 27%, rgba(115, 247, 255, 0.08) 28% 31%, transparent 32%),
+    repeating-radial-gradient(circle at 50% 55%, rgba(115, 247, 255, 0.12) 0 1px, transparent 2px 26px),
+    conic-gradient(from 40deg, transparent, rgba(115, 247, 255, 0.18), transparent, rgba(38, 107, 255, 0.17), transparent);
+  border: 1px solid rgba(115, 247, 255, 0.32);
+  filter: drop-shadow(0 0 26px rgba(80, 160, 255, 0.24));
+  animation: earthBreathe 5.6s ease-in-out infinite;
+}
+
+.war-paths {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.war-paths path {
+  fill: none;
+  stroke: #73f7ff;
+  stroke-width: 3;
+  stroke-dasharray: 14 20;
+  filter: drop-shadow(0 0 10px rgba(115, 247, 255, 0.65));
+  animation: dashMove 2.8s linear infinite;
+}
+
+.war-paths .path-two { stroke: rgba(255, 67, 104, 0.72); animation-delay: 420ms; }
+.war-paths .path-three { stroke: rgba(69, 255, 209, 0.72); animation-delay: 760ms; }
+
+.blast {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 67, 104, 0.75);
+  box-shadow: 0 0 28px rgba(255, 67, 104, 0.75), inset 0 0 14px rgba(255, 211, 106, 0.45);
+  animation: nuclearPulse 1.9s ease-out infinite;
+}
+
+.blast-one { left: 21%; top: 60%; }
+.blast-two { left: 57%; top: 32%; animation-delay: 600ms; }
+.blast-three { right: 13%; top: 47%; animation-delay: 1080ms; }
+
+.holo-warship {
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  width: min(38vw, 330px);
+  transform: translateX(-50%);
+  filter: drop-shadow(0 0 28px rgba(115, 247, 255, 0.72));
+  animation: warshipDeploy 5.8s cubic-bezier(.19, 1, .22, 1) both;
+}
+
+.holo-warship svg {
+  width: 100%;
+  fill: rgba(115, 247, 255, 0.08);
+  stroke: #73f7ff;
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+
+.cutscene-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 470px;
+  animation: copyDecrypt 1.2s ease 2.2s both;
+}
+
+.cutscene-copy h2 {
+  margin: 10px 0 16px;
+  color: #e8fbff;
+  font-size: clamp(1.8rem, 4vw, 4rem);
+  line-height: 0.96;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 0 24px rgba(115, 247, 255, 0.42);
+}
+
+.cutscene-copy p:not(.panel-kicker) {
+  color: #8eb9cf;
+  line-height: 1.7;
+}
+
+.welcome-defender {
+  display: inline-block;
+  margin-top: 18px;
+  padding: 12px 18px;
+  color: #061411;
+  background: linear-gradient(90deg, #45ffd1, #e8fbff);
+  clip-path: polygon(16px 0, 100% 0, calc(100% - 16px) 100%, 0 100%);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  animation: welcomeLock 1.1s steps(4) 4.2s both;
+}
+
+body[data-sequence="handoff"] .threat-column,
+body[data-sequence="handoff"] .auth-panel {
+  opacity: 0;
+  pointer-events: none;
+}
+
+body[data-performance="low"] .post-login-cutscene::before,
+body[data-performance="low"] .post-login-cutscene::after,
+body[data-performance="low"] .holo-earth,
+body[data-performance="low"] .war-paths path,
+body[data-performance="low"] .warship-hologram,
+body[data-performance="low"] .warship-hologram .ship-scan {
+  animation-duration: 8s;
+}
+
+body[data-performance="low"] .blast { animation-duration: 2.6s; }
+body[data-performance="low"] .holo-warship { animation-duration: 4.4s; }
+
+body[data-performance="low"] .post-login-cutscene {
+  box-shadow: 0 0 42px rgba(42, 139, 255, 0.12), inset 0 0 32px rgba(115, 247, 255, 0.08);
+}
+
+@keyframes shipFloat {
+  0%, 100% { transform: translateY(0) skewX(-2deg); opacity: 0.78; }
+  50% { transform: translateY(-7px) skewX(-2deg); opacity: 1; }
+}
+
+@keyframes cutsceneIgnite {
+  from { opacity: 0; transform: scale(0.985); filter: blur(12px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+
+@keyframes holoGridDrift { to { transform: translate3d(-78px, -64px, 0); } }
+@keyframes earthBreathe { 50% { transform: scale(1.025); opacity: 0.82; } }
+@keyframes nuclearPulse { 0% { transform: scale(0.35); opacity: 0; } 35% { opacity: 1; } 100% { transform: scale(3.4); opacity: 0; } }
+@keyframes warshipDeploy { 0% { opacity: 0; transform: translateX(-50%) translateY(52px) scale(0.78); } 55% { opacity: 1; } 100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } }
+@keyframes copyDecrypt { from { opacity: 0; transform: translateX(24px); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes welcomeLock { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+@media (max-width: 1180px), (pointer: coarse) {
+  .threat-column {
+    position: static;
+    z-index: auto;
+    opacity: 0.72;
+  }
+
+  .post-login-cutscene {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+
+  .holo-map {
+    height: min(50vh, 420px);
+  }
+}
+
+@media (max-width: 640px) {
+  .post-login-cutscene {
+    inset: 10px;
+    padding: 18px 14px;
+    clip-path: polygon(24px 0, 100% 0, 100% calc(100% - 32px), calc(100% - 32px) 100%, 0 100%, 0 24px);
+  }
+
+  .holo-map {
+    min-height: 240px;
+    height: 42vh;
+  }
+
+  .cutscene-copy h2 {
+    font-size: clamp(1.55rem, 9vw, 2.4rem);
+  }
+
+  .welcome-defender {
+    width: 100%;
+    text-align: center;
+    font-size: 0.72rem;
+  }
+}
+
+body[data-sequence="handoff"] #matrixCanvas {
+  opacity: 0.08;
+}

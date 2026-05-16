@@ -5,21 +5,21 @@ export function startMatrixRain() {
   let width = window.innerWidth;
   let height = window.innerHeight;
   let lowPower = document.body.dataset.performance === "low";
-  let pixelRatio = Math.min(window.devicePixelRatio || 1, lowPower ? 1 : 1.5);
-  let size = lowPower ? 22 : 15;
+  let pixelRatio = Math.min(window.devicePixelRatio || 1, lowPower ? 1 : 1.25);
+  let size = lowPower ? 24 : 18;
   let columns = 0;
   let drops = [];
   let lastFrame = 0;
-  let frameInterval = lowPower ? 70 : 34;
+  let frameInterval = lowPower ? 82 : 42;
   let resizeTimer;
 
   function configureCanvas() {
     width = window.innerWidth;
     height = window.innerHeight;
     lowPower = document.body.dataset.performance === "low";
-    pixelRatio = Math.min(window.devicePixelRatio || 1, lowPower ? 1 : 1.5);
-    size = lowPower ? 22 : 15;
-    frameInterval = lowPower ? 70 : 34;
+    pixelRatio = Math.min(window.devicePixelRatio || 1, lowPower ? 1 : 1.25);
+    size = lowPower ? 24 : 18;
+    frameInterval = lowPower ? 82 : 42;
 
     canvas.width = Math.floor(width * pixelRatio);
     canvas.height = Math.floor(height * pixelRatio);
@@ -38,7 +38,10 @@ export function startMatrixRain() {
   window.addEventListener("resize", resize, { passive: true });
 
   function draw(timestamp = 0) {
-    if (document.hidden || timestamp - lastFrame < frameInterval) {
+    const handoffMode = document.body.dataset.sequence === "handoff";
+    const targetInterval = handoffMode ? Math.max(frameInterval, 90) : frameInterval;
+
+    if (document.hidden || timestamp - lastFrame < targetInterval) {
       requestAnimationFrame(draw);
       return;
     }
@@ -71,12 +74,12 @@ export async function runIntro() {
   const intro = document.getElementById("intro");
   const output = document.getElementById("introOutput");
   const lines = [
-    "[NATO-BLACKLINE] waking orbital cyber command lattice...",
-    "[SATCOM] syncing encrypted theater maps across contested zones...",
-    "[AI-SENTINEL] validating operator biometrics against ghost ledger...",
-    "[QUANTUM-FIREWALL] rotating cipher gates // hostile packets detected...",
-    "[STRIKE-NET] routing access through Sector 204 blacksite relay...",
-    "[CLEARANCE] strategic access window open // authenticate operator"
+    "[NATO-BLACKLINE] waking post-ash cyber command lattice...",
+    "[SATCOM] tracking nuclear winter cloud cover over dead zones...",
+    "[AI-SENTINEL] checking ghost-ledger clearance before alarms wake...",
+    "[QUANTUM-FIREWALL] rotating cipher gates // hostile packets nearby...",
+    "[STRIKE-NET] routing through Sector 204 bunker relay...",
+    "[CLEARANCE] dark access window open // authenticate before trace"
   ];
 
   for (const line of lines) {

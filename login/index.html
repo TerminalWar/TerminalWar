@@ -46,13 +46,19 @@
         <div class="panel-frame" aria-hidden="true"></div>
         <div class="corner corner-tl"></div>
         <div class="corner corner-br"></div>
-        <div class="classified-ribbon">TOP SECRET // EYES ONLY // 2050</div>
+        <div class="classified-ribbon">FILE SYSTEM // CYBER-GRID 2050</div>
 
         <div class="auth-grid">
           <div class="identity-stack">
             <div class="avatar-wrap" aria-hidden="true">
               <div class="avatar-hex">
-                <div class="avatar-core">⌬</div>
+                <svg class="warship-hologram" viewBox="0 0 160 110" role="img" aria-label="Holographic warship silhouette">
+                  <path class="ship-hull" d="M18 69h84l17-13 23 1-14 20H36z" />
+                  <path class="ship-deck" d="M55 54h39l8 15H43z" />
+                  <path class="ship-tower" d="M74 25h18l8 29H65z" />
+                  <path class="ship-mast" d="M82 9v19M70 17h28M91 28l22 12" />
+                  <path class="ship-scan" d="M24 86c28 8 84 8 112-1" />
+                </svg>
               </div>
             </div>
             <div class="signal-readout">
@@ -64,7 +70,7 @@
           <div class="auth-content">
             <p class="panel-kicker">TerminalWar // Blacksite Sector 204</p>
             <h1>STRATEGIC ACCESS GATE</h1>
-            <p id="subtitle" class="subtitle">Operator verification required for live cyber theater.</p>
+            <p id="subtitle" class="subtitle">Unauthorized presence detected. Prove clearance before the grid notices.</p>
 
             <div class="field hidden">
               <label for="username">Operator Callsign</label>
@@ -90,6 +96,36 @@
             <button id="forceLogoutBtn" class="ghost-btn danger" type="button">Purge Local Session</button>
             <p id="status" role="status" aria-live="polite"></p>
           </div>
+        </div>
+      </section>
+
+
+      <section id="postLoginCutscene" class="post-login-cutscene hidden" aria-live="polite">
+        <div class="cutscene-frame" aria-hidden="true"></div>
+        <div class="holo-map" aria-hidden="true">
+          <div class="holo-earth"></div>
+          <span class="blast blast-one"></span>
+          <span class="blast blast-two"></span>
+          <span class="blast blast-three"></span>
+          <svg class="war-paths" viewBox="0 0 1000 620" preserveAspectRatio="none">
+            <path class="path-one" d="M90 420 C250 270 360 290 520 190 S760 100 920 220" />
+            <path class="path-two" d="M160 180 C330 260 410 440 640 390 S810 350 930 500" />
+            <path class="path-three" d="M88 520 C260 490 390 380 505 315 S690 238 875 284" />
+          </svg>
+          <div class="holo-warship">
+            <svg viewBox="0 0 260 150">
+              <path d="M25 92h146l31-21 35 2-25 34H54z" />
+              <path d="M86 67h67l13 25H68z" />
+              <path d="M118 23h32l17 44h-65z" />
+              <path d="M133 4v28M111 14h50M151 32l42 22" />
+            </svg>
+          </div>
+        </div>
+        <div class="cutscene-copy">
+          <p class="panel-kicker">Post-nuclear command handoff // Sector 204</p>
+          <h2>THE OLD WORLD BURNED. THE GRID STILL FIGHTS.</h2>
+          <p>Orbital ash clouds detected. Blackline fleet surviving. Cyber-defense authority transferring to your terminal.</p>
+          <strong class="welcome-defender">WELCOME, CYBER DEFENDER</strong>
         </div>
       </section>
 

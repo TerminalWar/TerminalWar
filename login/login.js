@@ -13,6 +13,8 @@ const switchBtn = document.getElementById("switchModeBtn");
 const forceLogoutBtn = document.getElementById("forceLogoutBtn");
 const statusMsg = document.getElementById("status");
 const authPanel = document.getElementById("authPanel");
+const postLoginCutscene = document.getElementById("postLoginCutscene");
+const introPanel = document.getElementById("intro");
 const subtitle = document.getElementById("subtitle");
 
 function configureViewportMode() {
@@ -32,8 +34,28 @@ function configureViewportMode() {
 configureViewportMode();
 window.addEventListener("resize", configureViewportMode, { passive: true });
 
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function enterGameWithCutscene() {
+  if (transferStarted) return;
+  transferStarted = true;
+
+  statusMsg.textContent = "Clearance accepted. Opening war-room uplink...";
+  authPanel.classList.add("hidden");
+  introPanel.classList.add("hidden");
+  postLoginCutscene.classList.remove("hidden");
+  document.body.dataset.sequence = "handoff";
+
+  const isLowPower = document.body.dataset.performance === "low";
+  await wait(isLowPower ? 5200 : 6400);
+  goToGame();
+}
+
 let introDone = false;
 let isSignupMode = false;
+let transferStarted = false;
 startMatrixRain();
 
 const params = new URLSearchParams(window.location.search);
@@ -45,8 +67,8 @@ function setMode(signupMode) {
   signupBtn.classList.toggle("hidden", !signupMode);
   loginBtn.classList.toggle("hidden", signupMode);
   switchBtn.textContent = signupMode ? "Return to Operator Authorization" : "Request New Blackline Callsign";
-  subtitle.textContent = signupMode ? "Enroll a cleared asset into the Sector 204 command ledger." : "Operator verification required for live cyber theater.";
-  statusMsg.textContent = signupMode ? "Awaiting asset registration packet." : "Secure gate standing by.";
+  subtitle.textContent = signupMode ? "Enroll a cleared asset into the Sector 204 command ledger." : "Unauthorized presence detected. Prove clearance before the grid notices.";
+  statusMsg.textContent = signupMode ? "Awaiting asset registration packet." : "Ashfall uplink quiet. Secure gate standing by.";
 }
 
 function mapAuthError(errorCode) {
@@ -78,7 +100,7 @@ loginBtn.addEventListener("click", async () => {
   statusMsg.textContent = "Verifying operator clearance...";
   try {
     await login(email, password);
-    goToGame();
+    await enterGameWithCutscene();
   } catch (error) {
     statusMsg.textContent = mapAuthError(error.code);
   }
@@ -93,14 +115,14 @@ signupBtn.addEventListener("click", async () => {
   statusMsg.textContent = "Registering cleared blackline asset...";
   try {
     await signUp(email, password, username);
-    goToGame();
+    await enterGameWithCutscene();
   } catch (error) {
     statusMsg.textContent = mapAuthError(error.code);
   }
 });
 
 onAuthStateChanged(auth, async (user) => {
-  if (user && !loggedOutFlag) return goToGame();
+  if (user && !loggedOutFlag) return enterGameWithCutscene();
 
   if (!introDone) {
     await runIntro();
