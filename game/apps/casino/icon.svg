@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 124 124" role="img" aria-label="casino icon">
+  <defs>
+    <linearGradient id="g" x1="16" y1="12" x2="108" y2="112" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ff3d9e"/>
+      <stop offset="1" stop-color="#07111f"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect x="10" y="10" width="104" height="104" rx="28" fill="url(#g)" opacity=".96"/>
+  <path d="M26 28h68a12 12 0 0112 12v44a12 12 0 01-12 12H26a12 12 0 01-12-12V40a12 12 0 0112-12z M38 48h.1 M62 62h.1 M86 76h.1" fill="none" stroke="#f5fbff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+</svg>
