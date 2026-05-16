@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="casino app icon">
+  <defs>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#202734"/><stop offset=".45" stop-color="#05070c"/><stop offset="1" stop-color="#323946"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <path d="M14 5h52l16 16v56L66 91H14L4 79V17z" fill="url(#metal)" stroke="#ff3d9e" stroke-width="2.5"/>
+  <path d="M22 14h38l12 12v42L60 80H22L14 70V24z" fill="#03060b" stroke="#ff3d9e" stroke-opacity=".35"/>
+  <path d="M20 24h46l14 14v34L66 86H20L6 72V38z M28 42h12v12H28z M54 42h12v12H54z M40 64h12v12H40z" fill="none" stroke="#ff3d9e" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+  <text x="48" y="59" fill="#ff3d9e" font-family="monospace" font-weight="900" font-size="26" text-anchor="middle" opacity=".18">C</text>
+</svg>

@@ -1809,3 +1809,139 @@ body[data-device="mobile"] .avatar-hex {
     height: 110px;
   }
 }
+
+/* Laptop/PC-only access gate. Mobile gets a deliberate hard stop, not a tiny UI. */
+.mobile-blocker {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background:
+    repeating-linear-gradient(90deg, rgba(115,247,255,.08) 0 1px, transparent 1px 46px),
+    repeating-linear-gradient(0deg, rgba(255,67,104,.07) 0 1px, transparent 1px 46px),
+    radial-gradient(circle at 50% 36%, rgba(255,67,104,.22), transparent 34%),
+    #02050a;
+}
+
+.mobile-blocker-card {
+  width: min(620px, 92vw);
+  padding: 34px;
+  text-align: center;
+  border: 1px solid rgba(115,247,255,.55);
+  clip-path: polygon(28px 0, 100% 0, 100% calc(100% - 34px), calc(100% - 34px) 100%, 0 100%, 0 28px);
+  background: linear-gradient(145deg, rgba(8,13,20,.96), rgba(1,3,7,.98));
+  box-shadow: 0 0 80px rgba(255,67,104,.2), inset 0 0 50px rgba(115,247,255,.07);
+}
+
+.mobile-blocker-card h1 {
+  margin: 8px 0 12px;
+  color: #ff4368;
+  letter-spacing: .14em;
+}
+
+body[data-device="mobile-blocked"] canvas,
+body[data-device="mobile-blocked"] .starfield,
+body[data-device="mobile-blocked"] .hud-overlay,
+body[data-device="mobile-blocked"] .screen {
+  display: none !important;
+}
+
+body[data-device="mobile-blocked"] .mobile-blocker {
+  display: grid !important;
+}
+
+/* More convincing hologram aircraft: radar-blue silhouettes with wings and tails. */
+.cinema-bomber,
+.bomber,
+.nuke-bomber {
+  width: 132px;
+  height: 72px;
+  background: transparent !important;
+  filter: drop-shadow(0 0 10px rgba(115,247,255,.95)) drop-shadow(0 0 26px rgba(45,130,255,.42));
+}
+
+.cinema-bomber::before,
+.bomber::before,
+.nuke-bomber::before {
+  inset: 24% 0 24% 0;
+  background: linear-gradient(90deg, rgba(232,251,255,.92), rgba(115,247,255,.96) 46%, rgba(45,130,255,.72));
+  clip-path: polygon(0 48%, 10% 36%, 56% 36%, 86% 0, 96% 0, 76% 43%, 100% 50%, 76% 57%, 96% 100%, 86% 100%, 56% 64%, 10% 64%);
+}
+
+.cinema-bomber::after,
+.bomber::after,
+.nuke-bomber::after {
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 0 19%, rgba(115,247,255,.34) 20% 21%, transparent 22% 100%),
+    rgba(115,247,255,.56);
+  clip-path: polygon(8% 44%, 42% 8%, 57% 8%, 49% 44%, 83% 47%, 83% 53%, 49% 56%, 57% 92%, 42% 92%, 8% 56%, 0 70%, 0 30%);
+  animation: hologramFlicker 1.8s steps(4) infinite;
+}
+
+.nuke-bomber {
+  width: 210px;
+  height: 106px;
+}
+
+/* Real mushroom-cloud read: cap lobes, hot core, stem, shockwave, and fallout skirt. */
+.mushroom-cloud {
+  left: 39%;
+  bottom: 8%;
+  width: 230px;
+  height: 255px;
+  background:
+    radial-gradient(ellipse at 50% 24%, rgba(255,252,220,.98) 0 13%, rgba(255,176,76,.92) 14% 22%, rgba(255,67,104,.48) 23% 31%, transparent 33%),
+    radial-gradient(ellipse at 29% 33%, rgba(255,236,180,.88), rgba(255,113,72,.42) 35%, transparent 52%),
+    radial-gradient(ellipse at 70% 34%, rgba(255,236,180,.82), rgba(255,113,72,.36) 36%, transparent 54%),
+    radial-gradient(ellipse at 49% 42%, rgba(255,255,240,.74), rgba(255,149,58,.36) 34%, transparent 58%),
+    radial-gradient(ellipse at 50% 78%, rgba(255,198,96,.56), transparent 35%),
+    linear-gradient(90deg, transparent 37%, rgba(255,238,188,.82) 43%, rgba(255,115,62,.56) 50%, rgba(255,238,188,.74) 57%, transparent 64%);
+  filter: drop-shadow(0 0 30px rgba(255,183,3,.85)) drop-shadow(0 0 80px rgba(255,67,104,.34));
+}
+
+.mushroom-cloud::before,
+.mushroom-cloud::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 20%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.mushroom-cloud::before {
+  width: 260px;
+  height: 64px;
+  border: 2px solid rgba(255,236,180,.62);
+  box-shadow: 0 0 42px rgba(255,183,3,.48), inset 0 0 24px rgba(255,67,104,.24);
+  animation: shockwaveBloom 8s ease-out infinite 2.4s;
+}
+
+.mushroom-cloud::after {
+  bottom: 0;
+  width: 180px;
+  height: 38px;
+  background: radial-gradient(ellipse, rgba(255,176,76,.46), transparent 70%);
+}
+
+@keyframes hologramFlicker {
+  0%, 100% { opacity: .68; transform: translateX(0); }
+  50% { opacity: 1; transform: translateX(1px); }
+}
+
+@keyframes shockwaveBloom {
+  0%, 56% { opacity: 0; transform: translateX(-50%) scale(.2); }
+  70% { opacity: .9; transform: translateX(-50%) scale(.8); }
+  100% { opacity: 0; transform: translateX(-50%) scale(1.65); }
+}
+
+@keyframes mushroomBloom {
+  0%, 52% { opacity: 0; transform: scale(.18) translateY(72px); filter: brightness(1.8) drop-shadow(0 0 22px rgba(255,236,180,.9)); }
+  64% { opacity: 1; transform: scale(.74) translateY(16px); }
+  82% { opacity: .92; transform: scale(1.06) translateY(-22px); }
+  100% { opacity: .18; transform: scale(1.42) translateY(-70px); }
+}

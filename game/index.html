@@ -3,45 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TerminalWar Game</title>
-    <style>
-      body {
-        margin: 0;
-        min-height: 100vh;
-        display: grid;
-        place-items: center;
-        background: radial-gradient(circle at top, #0f1626, #000 64%);
-        color: #fff;
-        font-family: Inter, system-ui, sans-serif;
-      }
-      .card {
-        width: min(760px, 92vw);
-        border: 1px solid #2f395a;
-        border-radius: 16px;
-        padding: 28px;
-        background: linear-gradient(180deg, rgba(27,34,56,.8), rgba(9,11,18,.95));
-        box-shadow: 0 12px 40px rgba(0,0,0,.5);
-        text-align: center;
-      }
-      #logoutBtn {
-        margin-top: 14px;
-        padding: 11px 16px;
-        border: 1px solid #93a8ff;
-        border-radius: 10px;
-        background: #18213f;
-        color: #dce5ff;
-        cursor: pointer;
-        font-weight: 700;
-      }
-      #statusText { color: #9eb4ff; min-height: 24px; }
-    </style>
+    <title>AACR Blacksite // Desktop</title>
+    <link rel="stylesheet" href="/game/styles/desktop.css" />
+    <link rel="stylesheet" href="/game/styles/windows.css" />
   </head>
   <body>
-    <section class="card">
-      <h1 id="welcomeText">Hello World</h1>
-      <p id="statusText">Checking session...</p>
-      <button id="logoutBtn" type="button">Logout</button>
+    <main id="gameShell" class="os-shell" aria-label="AACR Blacksite game desktop">
+      <section id="desktop" class="desktop" aria-label="AACR OS desktop"></section>
+
+      <section id="startMenu" class="start-menu" aria-label="Installed apps" hidden></section>
+      <section id="clockPanel" class="clock-panel" aria-label="System time and session controls" hidden></section>
+
+      <nav id="taskbar" class="taskbar" aria-label="Game desktop taskbar"></nav>
+    </main>
+    <section id="mobileBlocker" class="mobile-blocker" hidden aria-live="assertive">
+      <div class="mobile-blocker-card">
+        <p class="eyebrow">AACR DESKTOP SECURITY</p>
+        <h1>Mobile not supported</h1>
+        <p>Terminal War 2050 is a laptop/PC-only desktop game. Reconnect from a keyboard, mouse, and full browser workstation.</p>
+      </div>
     </section>
-    <script type="module" src="./main.js"></script>
+    <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+    <script type="module" src="/game/main.js"></script>
   </body>
 </html>

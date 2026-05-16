@@ -1,0 +1,590 @@
+:root {
+  --taskbar-height: 64px;
+  --glass: rgba(9, 14, 28, 0.72);
+  --glass-strong: rgba(8, 11, 22, 0.9);
+  --line: rgba(188, 231, 255, 0.22);
+  --text: #eff8ff;
+  --muted: #9fb6c6;
+  --cyan: #00f5ff;
+  --pink: #ff3d9e;
+  --green: #39ff14;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #030711;
+  color: var(--text);
+  font-family: Inter, "Segoe UI", system-ui, sans-serif;
+}
+
+button {
+  font: inherit;
+}
+
+.os-shell,
+.desktop {
+  width: 100vw;
+  height: 100vh;
+}
+
+.desktop {
+  position: relative;
+  overflow: hidden;
+  padding: 24px 24px calc(var(--taskbar-height) + 24px);
+  background-color: #050916;
+  background-blend-mode: screen, normal, normal, normal;
+}
+
+.desktop::before,
+.desktop::after,
+.desktop-overlay {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.desktop::before {
+  background:
+    linear-gradient(115deg, transparent 0 46%, rgba(0, 245, 255, 0.09) 47% 47.4%, transparent 48%),
+    linear-gradient(65deg, transparent 0 62%, rgba(255, 61, 158, 0.12) 63% 63.4%, transparent 64%);
+  clip-path: polygon(0 0, 100% 0, 100% 86%, 54% 100%, 0 82%);
+}
+
+.desktop::after {
+  background: radial-gradient(ellipse at center, transparent 48%, rgba(0, 0, 0, 0.42) 100%);
+}
+
+.desktop-overlay {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.025) 50%, transparent 50%);
+  background-size: 100% 4px;
+  mix-blend-mode: overlay;
+  opacity: 0.38;
+}
+
+.desktop-lore-card {
+  position: absolute;
+  right: clamp(20px, 6vw, 88px);
+  top: clamp(20px, 7vh, 80px);
+  width: min(420px, calc(100vw - 48px));
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: linear-gradient(145deg, rgba(10, 18, 36, 0.72), rgba(10, 12, 24, 0.48));
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.38), inset 0 0 45px rgba(0, 245, 255, 0.05);
+  backdrop-filter: blur(18px);
+}
+
+.desktop-lore-card h1 {
+  margin: 0 0 10px;
+  font-size: clamp(2rem, 5vw, 4.4rem);
+  line-height: 0.9;
+  letter-spacing: -0.08em;
+  text-transform: uppercase;
+}
+
+.desktop-lore-card p:last-child {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--cyan);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.desktop-shortcuts {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 96px);
+  grid-auto-rows: 108px;
+  grid-auto-flow: column;
+  width: min(420px, 45vw);
+  height: calc(100vh - var(--taskbar-height) - 48px);
+  gap: 10px 8px;
+}
+
+.desktop-shortcut {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  width: 92px;
+  min-height: 102px;
+  padding: 10px 8px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.desktop-shortcut:hover,
+.desktop-shortcut:focus-visible,
+.desktop-shortcut.is-selected {
+  border-color: rgba(0, 245, 255, 0.45);
+  background: rgba(0, 245, 255, 0.12);
+  outline: none;
+}
+
+.desktop-shortcut img {
+  width: 48px;
+  height: 48px;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.5));
+}
+
+.desktop-shortcut span {
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.taskbar {
+  position: fixed;
+  z-index: 500;
+  left: 14px;
+  right: 14px;
+  bottom: 12px;
+  height: var(--taskbar-height);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(16, 23, 42, 0.82), rgba(4, 7, 16, 0.84));
+  box-shadow: 0 16px 60px rgba(0, 0, 0, 0.45), inset 0 1px rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(22px) saturate(140%);
+}
+
+.app-launcher-button,
+.pinned-app,
+.taskbar-window,
+.clock-button {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.app-launcher-button {
+  width: 48px;
+  height: 44px;
+  border-radius: 16px;
+  background: conic-gradient(from 220deg, var(--cyan), var(--pink), var(--green), var(--cyan));
+  color: #021018;
+  font-weight: 1000;
+  letter-spacing: -0.12em;
+}
+
+.pinned-apps,
+.taskbar-window-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pinned-app,
+.taskbar-window {
+  height: 44px;
+  border-radius: 14px;
+}
+
+.pinned-app {
+  width: 48px;
+}
+
+.pinned-app img,
+.taskbar-window img,
+.start-app img {
+  width: 26px;
+  height: 26px;
+}
+
+.taskbar-window-strip {
+  flex: 1;
+  min-width: 0;
+  overflow: auto hidden;
+}
+
+.taskbar-window {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 112px;
+  padding: 0 12px;
+}
+
+.taskbar-window.is-minimized {
+  opacity: 0.62;
+}
+
+.clock-button {
+  display: grid;
+  place-items: center;
+  min-width: 90px;
+  height: 44px;
+  padding: 4px 12px;
+  border-radius: 16px;
+}
+
+.clock-button span {
+  font-weight: 800;
+}
+
+.clock-button small {
+  color: var(--muted);
+  line-height: 1;
+}
+
+.start-menu,
+.clock-panel {
+  position: fixed;
+  z-index: 490;
+  bottom: calc(var(--taskbar-height) + 22px);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: var(--glass-strong);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(24px) saturate(150%);
+}
+
+.start-menu {
+  left: 18px;
+  width: min(620px, calc(100vw - 36px));
+  padding: 20px;
+}
+
+.start-header,
+.clock-card,
+.operator-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.start-header h2 {
+  margin: 0;
+}
+
+.start-header > span {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(0, 245, 255, 0.12);
+  color: var(--cyan);
+  font-weight: 900;
+}
+
+.start-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.start-app {
+  min-height: 104px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.055);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.start-app:hover,
+.start-app:focus-visible,
+.pinned-app:hover,
+.taskbar-window:hover,
+.clock-button:hover {
+  border-color: rgba(0, 245, 255, 0.45);
+  background: rgba(0, 245, 255, 0.12);
+  outline: none;
+}
+
+.start-app span {
+  font-weight: 800;
+}
+
+.start-app small {
+  color: var(--pink);
+}
+
+.clock-panel {
+  right: 18px;
+  width: min(360px, calc(100vw - 36px));
+  padding: 18px;
+}
+
+.clock-card,
+.operator-card {
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.clock-card {
+  display: grid;
+  justify-items: start;
+}
+
+.clock-card strong {
+  font-size: 2rem;
+}
+
+.clock-card span,
+.operator-card span {
+  color: var(--muted);
+}
+
+.operator-card {
+  margin: 12px 0;
+}
+
+.logout-button {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1px solid rgba(255, 61, 158, 0.5);
+  border-radius: 16px;
+  background: rgba(255, 61, 158, 0.14);
+  color: #ffd9ea;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.toast-region {
+  position: fixed;
+  z-index: 900;
+  right: 20px;
+  top: 20px;
+  display: grid;
+  gap: 10px;
+}
+
+.toast {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--glass-strong);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+
+@media (max-width: 720px) {
+  .desktop-shortcuts {
+    grid-auto-flow: row;
+    width: 100%;
+  }
+
+  .desktop-lore-card {
+    display: none;
+  }
+
+  .taskbar {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    border-radius: 18px;
+  }
+
+  .taskbar-window span {
+    display: none;
+  }
+
+  .clock-button {
+    min-width: 72px;
+  }
+}
+
+/* AACR 2050 desktop overhaul: brutal black metal, no soft toy bevels. */
+:root {
+  --metal-black: #030407;
+  --metal-edge: #232a31;
+  --blood: #ff315a;
+  --acid: #39ff14;
+  --aacr-cyan: #45ffd1;
+  --amber: #ffb703;
+  --panel-cut: polygon(18px 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%, 0 18px);
+}
+
+body {
+  min-width: 1024px;
+  background:
+    radial-gradient(circle at 50% -20%, rgba(69, 255, 209, 0.16), transparent 35%),
+    linear-gradient(135deg, #020306, #080a10 48%, #010104);
+  font-family: "Rajdhani", "Orbitron", "Segoe UI", system-ui, sans-serif;
+}
+
+body[data-device="mobile-blocked"] .os-shell,
+body[data-device="mobile-blocked"] .taskbar,
+body[data-device="mobile-blocked"] .toast-region {
+  display: none !important;
+}
+
+.mobile-blocker {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+  background:
+    repeating-linear-gradient(90deg, rgba(69, 255, 209, 0.08) 0 1px, transparent 1px 54px),
+    repeating-linear-gradient(0deg, rgba(255, 49, 90, 0.06) 0 1px, transparent 1px 54px),
+    radial-gradient(circle at 50% 38%, rgba(255, 49, 90, 0.18), transparent 32%),
+    #020306;
+}
+
+.mobile-blocker-card {
+  max-width: 620px;
+  padding: 34px;
+  clip-path: var(--panel-cut);
+  border: 1px solid rgba(69, 255, 209, 0.55);
+  background: linear-gradient(145deg, rgba(11, 14, 18, 0.94), rgba(2, 3, 6, 0.96));
+  box-shadow: 0 0 70px rgba(255, 49, 90, 0.18), inset 0 0 40px rgba(69, 255, 209, 0.07);
+  text-align: center;
+}
+
+.mobile-blocker-card h1 {
+  margin: 0 0 14px;
+  color: var(--blood);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.desktop {
+  padding: 30px 30px calc(var(--taskbar-height) + 34px);
+  background-blend-mode: screen, overlay, normal, normal;
+}
+
+.desktop::before {
+  background:
+    linear-gradient(116deg, transparent 0 34%, rgba(69, 255, 209, 0.14) 34.3% 34.8%, transparent 35.1% 100%),
+    linear-gradient(36deg, transparent 0 69%, rgba(255, 49, 90, 0.16) 69.3% 69.8%, transparent 70.1% 100%),
+    radial-gradient(ellipse at 70% 48%, rgba(69, 255, 209, 0.08), transparent 38%);
+  animation: aacrGridPulse 7s ease-in-out infinite;
+}
+
+.desktop-overlay {
+  background:
+    linear-gradient(rgba(255,255,255,.035) 50%, transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(255, 49, 90, 0.12), transparent 24%);
+  background-size: 100% 3px, auto;
+}
+
+.desktop-lore-card {
+  top: clamp(30px, 8vh, 96px);
+  right: clamp(32px, 7vw, 110px);
+  border-radius: 0;
+  clip-path: var(--panel-cut);
+  border-color: rgba(69, 255, 209, 0.42);
+  background:
+    linear-gradient(135deg, rgba(34, 41, 48, 0.78), rgba(3, 4, 7, 0.84)),
+    repeating-linear-gradient(135deg, rgba(255,255,255,.04) 0 1px, transparent 1px 11px);
+  box-shadow: 0 26px 110px rgba(0,0,0,.74), 0 0 80px rgba(69,255,209,.10), inset 0 0 0 1px rgba(255,255,255,.05);
+}
+
+.desktop-lore-card h1 {
+  color: #f8feff;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 20px rgba(69,255,209,.45), 3px 0 0 rgba(255,49,90,.32);
+}
+
+.desktop-shortcut {
+  border-radius: 0;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 10px);
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, filter 160ms ease;
+}
+
+.desktop-shortcut:hover,
+.desktop-shortcut:focus-visible,
+.desktop-shortcut.is-selected {
+  transform: translateY(-4px) skewX(-2deg);
+  border-color: rgba(69,255,209,.8);
+  background: linear-gradient(145deg, rgba(69,255,209,.15), rgba(255,49,90,.08));
+  box-shadow: 0 0 24px rgba(69,255,209,.16), inset 0 0 16px rgba(69,255,209,.08);
+}
+
+.desktop-shortcut img,
+.pinned-app img,
+.taskbar-window img,
+.start-app img {
+  filter: drop-shadow(0 0 10px rgba(69,255,209,.42)) drop-shadow(0 10px 18px rgba(0,0,0,.85));
+}
+
+.taskbar,
+.start-menu,
+.clock-panel {
+  border-radius: 0;
+  clip-path: var(--panel-cut);
+  border-color: rgba(69,255,209,.32);
+  background:
+    linear-gradient(180deg, rgba(29, 35, 42, .9), rgba(3, 4, 7, .94)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 1px, transparent 1px 12px);
+  box-shadow: 0 20px 80px rgba(0,0,0,.72), 0 0 48px rgba(69,255,209,.08), inset 0 1px rgba(255,255,255,.08);
+}
+
+.app-launcher-button {
+  width: 70px;
+  border-radius: 0;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  background:
+    linear-gradient(135deg, #111820, #020305 55%, #271016),
+    radial-gradient(circle, rgba(69,255,209,.25), transparent 65%);
+  color: var(--aacr-cyan);
+  border-color: rgba(69,255,209,.62);
+  letter-spacing: .06em;
+  text-shadow: 0 0 10px rgba(69,255,209,.8);
+}
+
+.pinned-app,
+.taskbar-window,
+.clock-button,
+.start-app,
+.clock-card,
+.operator-card,
+.logout-button,
+.toast {
+  border-radius: 0;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  background: linear-gradient(145deg, rgba(24,30,36,.84), rgba(4,5,9,.82));
+}
+
+.start-app:hover,
+.start-app:focus-visible,
+.pinned-app:hover,
+.taskbar-window:hover,
+.clock-button:hover {
+  border-color: rgba(69,255,209,.82);
+  background: linear-gradient(145deg, rgba(69,255,209,.18), rgba(255,49,90,.10));
+}
+
+@keyframes aacrGridPulse {
+  0%, 100% { opacity: .68; transform: translate3d(0,0,0); }
+  50% { opacity: 1; transform: translate3d(-10px, 4px, 0); }
+}
+
+@media (max-width: 760px), (pointer: coarse) and (max-width: 900px) {
+  .os-shell,
+  .taskbar,
+  .toast-region { display: none !important; }
+  .mobile-blocker { display: grid !important; }
+}

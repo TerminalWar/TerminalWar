@@ -17,17 +17,33 @@ const postLoginCutscene = document.getElementById("postLoginCutscene");
 const introPanel = document.getElementById("intro");
 const subtitle = document.getElementById("subtitle");
 const gameplayTip = document.getElementById("gameplayTip");
+const mobileBlocker = document.getElementById("mobileBlocker");
+
+function isMobileDevice() {
+  const ua = navigator.userAgent || "";
+  const phoneOrTabletUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+  const touchSmallScreen = (navigator.maxTouchPoints || 0) > 1 && Math.min(window.innerWidth, window.innerHeight) <= 900;
+  return phoneOrTabletUA || touchSmallScreen;
+}
+
+function lockMobilePlayers() {
+  if (!isMobileDevice()) return false;
+  document.documentElement.dataset.device = "mobile-blocked";
+  document.body.dataset.device = "mobile-blocked";
+  if (mobileBlocker) mobileBlocker.hidden = false;
+  return true;
+}
 
 function configureViewportMode() {
   const width = window.innerWidth;
   const hasTouch = window.matchMedia("(pointer: coarse)").matches;
   const deviceMemory = navigator.deviceMemory || 8;
   const cpuCores = navigator.hardwareConcurrency || 8;
-  const isMobile = width <= 760;
-  const isTablet = !isMobile && (width <= 1180 || hasTouch);
-  const isLowPower = isMobile || isTablet || deviceMemory <= 4 || cpuCores <= 4;
+  const isMobile = isMobileDevice();
+  const isTablet = false;
+  const isLowPower = isMobile || deviceMemory <= 4 || cpuCores <= 4;
 
-  const device = isMobile ? "mobile" : isTablet ? "tablet" : "desktop";
+  const device = isMobile ? "mobile-blocked" : "desktop";
   const performance = isLowPower ? "low" : "high";
 
   document.documentElement.dataset.device = device;
@@ -39,6 +55,7 @@ function configureViewportMode() {
 
 configureViewportMode();
 window.addEventListener("resize", configureViewportMode, { passive: true });
+const mobileLocked = lockMobilePlayers();
 
 const gameplayTips = [
   "Keep your signal quiet. Loud commands wake stronger countermeasures.",
@@ -69,7 +86,7 @@ async function enterGameWithCutscene() {
 let introDone = false;
 let isSignupMode = false;
 let transferStarted = false;
-startMatrixRain();
+if (!mobileLocked) startMatrixRain();
 
 const params = new URLSearchParams(window.location.search);
 const loggedOutFlag = params.get("loggedOut") === "1";
@@ -134,7 +151,7 @@ signupBtn.addEventListener("click", async () => {
   }
 });
 
-onAuthStateChanged(auth, async (user) => {
+if (!mobileLocked) onAuthStateChanged(auth, async (user) => {
   if (user && !loggedOutFlag) return enterGameWithCutscene();
 
   if (!introDone) {
