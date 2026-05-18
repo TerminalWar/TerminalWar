@@ -1,19 +1,24 @@
+import { createElement, createIcon } from "../../shared/dom.js";
+import { savePlayerRoute } from "./playerStore.js";
 import { UI_CONFIG } from "../config/ui.config.js";
+import { getAppAccess } from "./appAccess.js";
 import { createAppContent, routeToApp } from "./appLoader.js";
 import { desktopState, nextZIndex } from "./state.js";
 
 let windowSequence = 0;
 let desktopElement;
 let taskbarRefresh;
+let notify = () => {};
+const launchedApps = new Set();
 
-export function initWindowManager({ desktop, onWindowsChanged }) {
+export function initWindowManager({ desktop, onWindowsChanged, showToast }) {
   desktopElement = desktop;
   taskbarRefresh = onWindowsChanged;
+  notify = showToast || notify;
 }
 
 async function saveRouteToDatastore(path) {
   try {
-    const { savePlayerRoute } = await import("./playerStore.js");
     await savePlayerRoute(desktopState.user, path);
   } catch (error) {
     console.warn("Route datastore sync failed", error);
@@ -31,7 +36,21 @@ function setActiveWindow(windowId) {
 }
 
 function constrainPosition(value, min, max) {
-  return Math.min(Math.max(value, min), max);
+  return Math.min(Math.max(value, min), Math.max(min, max));
+}
+
+function getViewportBounds() {
+  const gap = UI_CONFIG.windows.minViewportGap;
+  return {
+    gap,
+    width: window.innerWidth,
+    height: window.innerHeight,
+    usableBottom: window.innerHeight - UI_CONFIG.taskbar.height - gap
+  };
+}
+
+function shouldMobileMaximize() {
+  return UI_CONFIG.windows.mobileMaximizedByDefault && window.innerWidth <= UI_CONFIG.windows.mobileBreakpoint;
 }
 
 function makeDraggable(windowEl, handle) {
@@ -52,23 +71,34 @@ function makeDraggable(windowEl, handle) {
 
   handle.addEventListener("pointermove", (event) => {
     if (!dragState) return;
-    const maxLeft = window.innerWidth - windowEl.offsetWidth;
-    const maxTop = window.innerHeight - UI_CONFIG.taskbar.height - 80;
-    windowEl.style.left = `${constrainPosition(dragState.left + event.clientX - dragState.startX, 8, maxLeft)}px`;
-    windowEl.style.top = `${constrainPosition(dragState.top + event.clientY - dragState.startY, 8, maxTop)}px`;
+    const bounds = getViewportBounds();
+    const maxLeft = bounds.width - windowEl.offsetWidth - bounds.gap;
+    const maxTop = bounds.usableBottom - windowEl.offsetHeight;
+    windowEl.style.left = `${constrainPosition(dragState.left + event.clientX - dragState.startX, bounds.gap, maxLeft)}px`;
+    windowEl.style.top = `${constrainPosition(dragState.top + event.clientY - dragState.startY, bounds.gap, maxTop)}px`;
   });
 
-  handle.addEventListener("pointerup", (event) => {
+  function endDrag(event) {
     dragState = null;
     if (handle.hasPointerCapture(event.pointerId)) handle.releasePointerCapture(event.pointerId);
-  });
+  }
+
+  handle.addEventListener("pointerup", endDrag);
+  handle.addEventListener("pointercancel", endDrag);
 }
 
 function stopWindowControlEvent(event) {
   event.stopPropagation();
 }
 
-function closeWindow(windowId) {
+function syncBaseRouteIfEmpty(updateRoute = true) {
+  if (desktopState.openWindows.size === 0 && window.location.pathname !== "/game/") {
+    if (updateRoute) window.history.pushState({}, "", "/game/");
+    saveRouteToDatastore("/game/");
+  }
+}
+
+function closeWindow(windowId, { updateRoute = true } = {}) {
   const record = desktopState.openWindows.get(windowId);
   if (!record) return;
   record.element.remove();
@@ -76,10 +106,15 @@ function closeWindow(windowId) {
   if (desktopState.activeWindowId === windowId) {
     desktopState.activeWindowId = desktopState.openWindows.keys().next().value || null;
   }
-  if (desktopState.openWindows.size === 0 && window.location.pathname !== "/game/") {
-    window.history.pushState({}, "", "/game/");
-    saveRouteToDatastore("/game/");
-  }
+  syncBaseRouteIfEmpty(updateRoute);
+  taskbarRefresh?.();
+}
+
+export function closeAllWindows({ updateRoute = true } = {}) {
+  for (const record of desktopState.openWindows.values()) record.element.remove();
+  desktopState.openWindows.clear();
+  desktopState.activeWindowId = null;
+  syncBaseRouteIfEmpty(updateRoute);
   taskbarRefresh?.();
 }
 
@@ -92,7 +127,47 @@ function sleep(ms) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
+function createWindowShell(appConfig, windowId, width, height, offset) {
+  const bounds = getViewportBounds();
+  const windowEl = createElement("article", {
+    className: "app-window",
+    dataset: { windowId },
+    style: {
+      "--app-accent": appConfig.accent,
+      width: `${Math.min(width, bounds.width - bounds.gap * 2)}px`,
+      height: `${Math.min(height, bounds.usableBottom - bounds.gap)}px`,
+      left: `${constrainPosition(86 + offset, bounds.gap, bounds.width - Math.min(width, bounds.width - bounds.gap * 2) - bounds.gap)}px`,
+      top: `${constrainPosition(54 + offset, bounds.gap, bounds.usableBottom - Math.min(height, bounds.usableBottom - bounds.gap))}px`
+    }
+  });
+
+  const loader = createElement("div", { className: "app-launch-loader", attributes: { "aria-hidden": "true" } }, [
+    createElement("div", { className: "loader-core" }, [createElement("span"), createElement("span"), createElement("span")]),
+    createElement("strong", { text: `AACR loading ${appConfig.shortName}` }),
+    createElement("small", { text: "decrypting app shell // syncing blacksite permissions" })
+  ]);
+  const titlebar = createElement("header", { className: "window-titlebar" });
+  const title = createElement("div", { className: "window-title" }, [createIcon(appConfig.icon), createElement("span", { text: appConfig.name })]);
+  const controls = createElement("div", { className: "window-controls" }, [
+    createElement("button", { type: "button", text: "−", attributes: { "data-action": "minimize" }, ariaLabel: `Minimize ${appConfig.name}` }),
+    createElement("button", { type: "button", text: "□", attributes: { "data-action": "maximize" }, ariaLabel: `Maximize ${appConfig.name}` }),
+    createElement("button", { type: "button", text: "×", attributes: { "data-action": "close" }, ariaLabel: `Close ${appConfig.name}` })
+  ]);
+  const content = createElement("div", { className: "window-content" }, [createElement("div", { className: "loading-stripe", text: "Loading app shell…" })]);
+
+  titlebar.append(title, controls);
+  windowEl.append(loader, titlebar, content);
+  if (shouldMobileMaximize()) windowEl.classList.add("is-maximized");
+  return { windowEl, titlebar, controls, content };
+}
+
 export async function openAppWindow(appConfig, { updateRoute = true } = {}) {
+  const access = getAppAccess(appConfig, desktopState.playerProfile);
+  if (!access.canOpen) {
+    notify(`${appConfig.shortName} is locked. ${access.reason}.`);
+    return null;
+  }
+
   const existing = Array.from(desktopState.openWindows.values()).find((record) => record.app.id === appConfig.id);
   if (existing) {
     existing.element.hidden = false;
@@ -108,41 +183,10 @@ export async function openAppWindow(appConfig, { updateRoute = true } = {}) {
   const width = appConfig.window?.width || UI_CONFIG.windows.defaultSize.width;
   const height = appConfig.window?.height || UI_CONFIG.windows.defaultSize.height;
   const offset = (windowSequence - 1) * UI_CONFIG.windows.cascadeOffset;
+  const { windowEl, titlebar, controls, content } = createWindowShell(appConfig, windowId, width, height, offset);
 
-  const windowEl = document.createElement("article");
-  windowEl.className = "app-window";
-  windowEl.dataset.windowId = windowId;
-  windowEl.style.width = `${width}px`;
-  windowEl.style.height = `${height}px`;
-  windowEl.style.left = `${Math.min(86 + offset, window.innerWidth - 360)}px`;
-  windowEl.style.top = `${Math.min(54 + offset, window.innerHeight - 340)}px`;
-  windowEl.style.setProperty("--app-accent", appConfig.accent);
-  windowEl.innerHTML = `
-    <div class="app-launch-loader" aria-hidden="true">
-      <div class="loader-core"><span></span><span></span><span></span></div>
-      <strong>AACR loading ${appConfig.shortName}</strong>
-      <small>decrypting app shell // syncing blacksite permissions</small>
-    </div>
-    <header class="window-titlebar">
-      <div class="window-title">
-        <img src="${appConfig.icon}" alt="" />
-        <span>${appConfig.name}</span>
-      </div>
-      <div class="window-controls">
-        <button type="button" data-action="minimize" aria-label="Minimize ${appConfig.name}">−</button>
-        <button type="button" data-action="maximize" aria-label="Maximize ${appConfig.name}">□</button>
-        <button type="button" data-action="close" aria-label="Close ${appConfig.name}">×</button>
-      </div>
-    </header>
-    <div class="window-content"><div class="loading-stripe">Loading app shell…</div></div>
-  `;
-
-  const titlebar = windowEl.querySelector(".window-titlebar");
-  const content = windowEl.querySelector(".window-content");
   makeDraggable(windowEl, titlebar);
-
   windowEl.addEventListener("pointerdown", () => setActiveWindow(windowId));
-  const controls = windowEl.querySelector(".window-controls");
   controls.addEventListener("pointerdown", stopWindowControlEvent);
   controls.addEventListener("click", stopWindowControlEvent);
   windowEl.querySelector('[data-action="close"]').addEventListener("click", (event) => {
@@ -164,13 +208,15 @@ export async function openAppWindow(appConfig, { updateRoute = true } = {}) {
   setActiveWindow(windowId);
 
   try {
-    await sleep(UI_CONFIG.windows.launchDelayMs || 3000);
+    const launchDelay = launchedApps.has(appConfig.id) ? UI_CONFIG.windows.repeatLaunchDelayMs : UI_CONFIG.windows.launchDelayMs;
+    await sleep(launchDelay);
+    launchedApps.add(appConfig.id);
     if (!desktopState.openWindows.has(windowId)) return null;
     windowEl.querySelector(".app-launch-loader")?.classList.add("is-complete");
     content.replaceChildren(await createAppContent(appConfig));
   } catch (error) {
     console.error(`Failed to load ${appConfig.id}`, error);
-    content.innerHTML = `<div class="app-error">App failed to load. Check console for details.</div>`;
+    content.replaceChildren(createElement("div", { className: "app-error", text: "App failed to load. Check console for details." }));
   }
 
   if (updateRoute) {

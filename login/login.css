@@ -1111,7 +1111,7 @@ body[data-sequence="handoff"] #matrixCanvas {
   opacity: 0.08;
 }
 
-/* final cinematic pass: separate desktop/mobile language and 30-second asset handoff */
+/* final cinematic pass: separate desktop/mobile language and configurable asset handoff */
 .intro-cinematic {
   position: relative;
   height: clamp(190px, 32vh, 310px);
@@ -1810,48 +1810,6 @@ body[data-device="mobile"] .avatar-hex {
   }
 }
 
-/* Laptop/PC-only access gate. Mobile gets a deliberate hard stop, not a tiny UI. */
-.mobile-blocker {
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-  display: grid;
-  place-items: center;
-  padding: 28px;
-  background:
-    repeating-linear-gradient(90deg, rgba(115,247,255,.08) 0 1px, transparent 1px 46px),
-    repeating-linear-gradient(0deg, rgba(255,67,104,.07) 0 1px, transparent 1px 46px),
-    radial-gradient(circle at 50% 36%, rgba(255,67,104,.22), transparent 34%),
-    #02050a;
-}
-
-.mobile-blocker-card {
-  width: min(620px, 92vw);
-  padding: 34px;
-  text-align: center;
-  border: 1px solid rgba(115,247,255,.55);
-  clip-path: polygon(28px 0, 100% 0, 100% calc(100% - 34px), calc(100% - 34px) 100%, 0 100%, 0 28px);
-  background: linear-gradient(145deg, rgba(8,13,20,.96), rgba(1,3,7,.98));
-  box-shadow: 0 0 80px rgba(255,67,104,.2), inset 0 0 50px rgba(115,247,255,.07);
-}
-
-.mobile-blocker-card h1 {
-  margin: 8px 0 12px;
-  color: #ff4368;
-  letter-spacing: .14em;
-}
-
-body[data-device="mobile-blocked"] canvas,
-body[data-device="mobile-blocked"] .starfield,
-body[data-device="mobile-blocked"] .hud-overlay,
-body[data-device="mobile-blocked"] .screen {
-  display: none !important;
-}
-
-body[data-device="mobile-blocked"] .mobile-blocker {
-  display: grid !important;
-}
-
 /* More convincing hologram aircraft: radar-blue silhouettes with wings and tails. */
 .cinema-bomber,
 .bomber,
@@ -1944,4 +1902,88 @@ body[data-device="mobile-blocked"] .mobile-blocker {
   64% { opacity: 1; transform: scale(.74) translateY(16px); }
   82% { opacity: .92; transform: scale(1.06) translateY(-22px); }
   100% { opacity: .18; transform: scale(1.42) translateY(-70px); }
+}
+
+/* Cross-device login: no mobile hard stop; scale the cinematic gate down instead. */
+html,
+body {
+  min-width: 0;
+  min-height: calc(var(--app-vh, 1vh) * 100);
+}
+
+@media (max-width: 980px) {
+  body {
+    overflow: auto;
+  }
+
+  .screen {
+    grid-template-columns: 1fr;
+    min-height: calc(var(--app-vh, 1vh) * 100);
+    padding: 14px;
+  }
+
+  .threat-column {
+    display: none;
+  }
+
+  .panel,
+  .auth-panel {
+    width: min(100%, 760px);
+    justify-self: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .screen {
+    align-items: start;
+    padding: 10px;
+  }
+
+  .panel {
+    padding: 18px 14px;
+    clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%, 0 18px);
+  }
+
+  .auth-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .identity-stack {
+    border-right: 0;
+    border-bottom: 1px solid rgba(115, 247, 255, 0.18);
+  }
+
+  .avatar-wrap {
+    width: 132px;
+    height: 132px;
+  }
+
+  .avatar-hex {
+    width: 100px;
+    height: 100px;
+  }
+
+  .field input,
+  .actions button,
+  .ghost-btn {
+    min-height: 46px;
+    font-size: 16px;
+  }
+
+  .post-login-cutscene {
+    min-height: calc(var(--app-vh, 1vh) * 100);
+    height: auto;
+    overflow: auto;
+    padding: 10px;
+  }
+
+  .cutscene-phase {
+    min-height: 52vh;
+  }
+
+  .loading-sidebar {
+    position: relative;
+    width: 100%;
+    max-height: none;
+  }
 }

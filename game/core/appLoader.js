@@ -20,8 +20,12 @@ export function getDesktopApps() {
   return APP_CONFIGS.filter((app) => app.desktopShortcut);
 }
 
-export function getPinnedApps(pinnedIds) {
-  return pinnedIds.map((id) => APP_CONFIGS.find((app) => app.id === id)).filter(Boolean);
+export function getPinnedApps(pinnedIds = null) {
+  if (Array.isArray(pinnedIds) && pinnedIds.length > 0) {
+    return pinnedIds.map((id) => APP_CONFIGS.find((app) => app.id === id)).filter(Boolean);
+  }
+
+  return APP_CONFIGS.filter((app) => app.taskbarPinned);
 }
 
 export function getRouteSlugFromLocation(location = window.location) {

@@ -1,5 +1,6 @@
 export const desktopState = {
   user: null,
+  playerProfile: null,
   openWindows: new Map(),
   activeWindowId: null,
   zIndexSeed: 50,
@@ -8,6 +9,10 @@ export const desktopState = {
 
 export function setUser(user) {
   desktopState.user = user;
+}
+
+export function setPlayerProfile(profile) {
+  desktopState.playerProfile = profile;
 }
 
 export function getOperatorName(fallbackName) {

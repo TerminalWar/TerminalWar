@@ -4,16 +4,21 @@ import {
   signOut,
   updateProfile
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import { doc, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 import { auth, db } from "../shared/firebase.js";
 
+function normalizeUsername(username) {
+  return username.trim().replace(/\s+/g, " ").slice(0, 32);
+}
+
 export async function signUp(email, password, username) {
+  const displayName = normalizeUsername(username);
   const credential = await createUserWithEmailAndPassword(auth, email, password);
-  await updateProfile(credential.user, { displayName: username });
+  await updateProfile(credential.user, { displayName });
   await setDoc(doc(db, "users", credential.user.uid), {
-    username,
+    username: displayName,
     email,
-    createdAt: Date.now()
+    createdAt: serverTimestamp()
   });
   return credential;
 }

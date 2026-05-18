@@ -2,7 +2,7 @@ import { doc, getDoc, serverTimestamp, setDoc } from "https://www.gstatic.com/fi
 import { db } from "../../shared/firebase.js";
 import { GAME_CONFIG } from "../config/game.config.js";
 
-const DEFAULT_PROFILE = {
+export const DEFAULT_PROFILE = {
   economy: {
     credits: 0,
     lifetimeEarned: 0,
@@ -30,21 +30,39 @@ const DEFAULT_PROFILE = {
   }
 };
 
+function cloneDefaultProfile() {
+  return typeof globalThis.structuredClone === "function" ? globalThis.structuredClone(DEFAULT_PROFILE) : JSON.parse(JSON.stringify(DEFAULT_PROFILE));
+}
+
+export function mergePlayerProfile(profile = {}) {
+  const defaults = cloneDefaultProfile();
+  return {
+    ...defaults,
+    ...profile,
+    economy: { ...defaults.economy, ...(profile.economy || {}) },
+    progression: { ...defaults.progression, ...(profile.progression || {}) },
+    inventory: { ...defaults.inventory, ...(profile.inventory || {}) },
+    desktop: { ...defaults.desktop, ...(profile.desktop || {}) },
+    telemetry: { ...defaults.telemetry, ...(profile.telemetry || {}) }
+  };
+}
+
 export async function ensurePlayerGameProfile(user) {
   if (!user) return null;
 
   const userRef = doc(db, "users", user.uid);
   const snapshot = await getDoc(userRef);
   const currentGameProfile = snapshot.exists() ? snapshot.data().game : null;
+  const gameProfile = mergePlayerProfile(currentGameProfile || {});
 
   await setDoc(userRef, {
     email: user.email || null,
     username: user.displayName || user.email || "Wasteland Operator",
     lastLoginAt: serverTimestamp(),
-    ...(currentGameProfile ? {} : { game: DEFAULT_PROFILE })
+    game: gameProfile
   }, { merge: true });
 
-  return userRef;
+  return gameProfile;
 }
 
 export async function savePlayerRoute(user, path = window.location.pathname) {
