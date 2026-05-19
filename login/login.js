@@ -42,10 +42,7 @@ function wait(ms) {
 }
 
 function getHandoffDelay() {
-  const seenKey = UI_CONFIG.login.seenHandoffStorageKey;
-  const hasSeenHandoff = localStorage.getItem(seenKey) === "1";
-  localStorage.setItem(seenKey, "1");
-  return hasSeenHandoff ? UI_CONFIG.login.returningHandoffDelayMs : UI_CONFIG.login.firstHandoffDelayMs;
+  return UI_CONFIG.login.handoffDelayMs;
 }
 
 async function enterGameWithCutscene() {

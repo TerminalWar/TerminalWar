@@ -453,3 +453,9 @@ code {
     gap: 4px;
   }
 }
+
+.window-title img {
+  display: block;
+  object-fit: contain;
+  object-position: center;
+}

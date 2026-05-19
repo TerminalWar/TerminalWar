@@ -98,6 +98,20 @@ function syncBaseRouteIfEmpty(updateRoute = true) {
   }
 }
 
+
+function minimizeWindow(windowId) {
+  const record = desktopState.openWindows.get(windowId);
+  if (!record) return;
+  record.element.hidden = true;
+  if (desktopState.activeWindowId === windowId) {
+    const nextVisible = Array.from(desktopState.openWindows.values()).find((candidate) => !candidate.element.hidden);
+    desktopState.activeWindowId = nextVisible?.id || null;
+    if (nextVisible) setActiveWindow(nextVisible.id);
+    else record.element.classList.remove("is-active");
+  }
+  taskbarRefresh?.();
+}
+
 function closeWindow(windowId, { updateRoute = true } = {}) {
   const record = desktopState.openWindows.get(windowId);
   if (!record) return;
@@ -195,8 +209,7 @@ export async function openAppWindow(appConfig, { updateRoute = true } = {}) {
   });
   windowEl.querySelector('[data-action="minimize"]').addEventListener("click", (event) => {
     stopWindowControlEvent(event);
-    windowEl.hidden = true;
-    taskbarRefresh?.();
+    minimizeWindow(windowId);
   });
   windowEl.querySelector('[data-action="maximize"]').addEventListener("click", (event) => {
     stopWindowControlEvent(event);

@@ -718,3 +718,62 @@ body {
     top: 10px;
   }
 }
+
+/* Icon polish: keep SVGs contained and centered inside every launcher box. */
+.desktop-shortcut img,
+.pinned-app img,
+.taskbar-window img,
+.start-app img,
+.window-title img {
+  display: block;
+  object-fit: contain;
+  object-position: center;
+  flex: 0 0 auto;
+}
+
+.desktop-shortcut img {
+  width: clamp(42px, 5vw, 56px);
+  height: clamp(42px, 5vw, 56px);
+  max-width: 72%;
+  max-height: 56px;
+}
+
+.start-app img {
+  width: 34px;
+  height: 34px;
+}
+
+.pinned-app,
+.taskbar-window {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pinned-app img,
+.taskbar-window img {
+  width: 28px;
+  height: 28px;
+  max-width: calc(100% - 12px);
+  max-height: calc(100% - 12px);
+}
+
+@media (max-width: 720px) {
+  .taskbar-window-strip {
+    display: flex;
+    flex: 0 1 36vw;
+    min-width: 48px;
+    overflow: auto hidden;
+  }
+
+  .taskbar-window {
+    min-width: 42px;
+    width: 42px;
+    padding: 0;
+  }
+
+  .taskbar-window img {
+    width: 24px;
+    height: 24px;
+  }
+}

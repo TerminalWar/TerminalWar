@@ -31,8 +31,6 @@ export const UI_CONFIG = {
     durationMs: 3000
   },
   login: {
-    firstHandoffDelayMs: 6500,
-    returningHandoffDelayMs: 1200,
-    seenHandoffStorageKey: "terminalWar.seenLoginHandoff"
+    handoffDelayMs: 30000
   }
 };
