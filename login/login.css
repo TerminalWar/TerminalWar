@@ -2196,3 +2196,106 @@ body {
 .classified-ribbon {
   box-shadow: 0 0 12px rgba(255,211,106,.28);
 }
+
+
+/* Final cinematic corrections: recognizable Europe, synced nuke drop, and proper bomb orientation. */
+.europe-archive-map,
+.europe-strike-map {
+  inset: 4% 6% 8%;
+  width: 88%;
+  height: 88%;
+}
+
+.europe-archive-map .landmass,
+.europe-strike-map .landmass {
+  fill: rgba(86, 236, 255, 0.14) !important;
+  stroke: rgba(128, 247, 255, 0.96) !important;
+  stroke-width: 5.2 !important;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Force all aircraft to point in travel direction (left -> right). */
+.cinema-bomber,
+.bomber,
+.nuke-bomber {
+  transform: scaleX(-1) !important;
+}
+
+@keyframes bomberCross {
+  from { transform: translateX(-8vw) scaleX(-1); }
+  to { transform: translateX(122vw) scaleX(-1); }
+}
+
+.target-london { left: 27% !important; top: 47% !important; }
+.target-berlin { left: 50.5% !important; top: 44.5% !important; }
+.target-rome { left: 56% !important; top: 65% !important; }
+
+.nuke-bomber {
+  left: -26% !important;
+  top: 20% !important;
+  width: 198px !important;
+  height: 102px !important;
+  animation: nukeBomberPassReal 8s linear infinite !important;
+}
+
+/* A true bomb shape (nose down), not a stick/ball. */
+.falling-nuke {
+  width: 24px !important;
+  height: 72px !important;
+  left: 33.5% !important;
+  top: 28% !important;
+  background: none !important;
+  clip-path: none !important;
+  filter: drop-shadow(0 0 10px rgba(168, 233, 255, 0.95));
+  animation: nukeDropReal 8s linear infinite !important;
+}
+
+.falling-nuke::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #f3fbff 0 38%, #86dfff 39% 78%, #3ca5ff 79% 100%);
+  clip-path: polygon(50% 0, 80% 12%, 79% 76%, 100% 92%, 74% 100%, 26% 100%, 0 92%, 21% 76%, 20% 12%);
+}
+
+.falling-nuke::after {
+  content: "";
+  position: absolute;
+  inset: 8% 38% 54% 38%;
+  background: rgba(0,0,0,.22);
+}
+
+.mushroom-cloud {
+  left: 48% !important;
+  bottom: 8% !important;
+  width: 260px !important;
+  height: 272px !important;
+  animation: nukeCloudReal 8s ease-out infinite !important;
+}
+
+@keyframes nukeBomberPassReal {
+  0% { transform: translate3d(-10vw,0,0) scaleX(-1); opacity: 1; }
+  54% { transform: translate3d(56vw,0,0) scaleX(-1); opacity: 1; }
+  100% { transform: translate3d(124vw,0,0) scaleX(-1); opacity: 0; }
+}
+
+@keyframes nukeDropReal {
+  0%, 43% { opacity: 0; transform: translate3d(0,-22px,0) rotate(0deg); }
+  47% { opacity: 1; }
+  82% { opacity: 1; transform: translate3d(112px,264px,0) rotate(1deg); }
+  100% { opacity: 0; transform: translate3d(130px,300px,0) rotate(2deg); }
+}
+
+@keyframes nukeCloudReal {
+  0%, 59% { opacity: 0; transform: scale(.18) translateY(88px); }
+  71% { opacity: 1; transform: scale(.84) translateY(10px); }
+  85% { opacity: .9; transform: scale(1.12) translateY(-26px); }
+  100% { opacity: .12; transform: scale(1.48) translateY(-84px); }
+}
+
+/* Keep giant phase headline from hiding bomb animation on tablets. */
+@media (max-width: 1200px) {
+  .phase-copy h2 {
+    font-size: clamp(1.7rem, 5vw, 3.8rem);
+  }
+}

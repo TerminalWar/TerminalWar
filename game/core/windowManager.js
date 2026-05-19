@@ -105,7 +105,6 @@ function syncBaseRouteIfEmpty(updateRoute = true) {
 
 
 function minimizeWindow(windowId) {
-  if (isSmallTouchLayout()) return;
   const record = desktopState.openWindows.get(windowId);
   if (!record) return;
   record.element.hidden = true;

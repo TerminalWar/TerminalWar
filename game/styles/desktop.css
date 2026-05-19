@@ -856,3 +856,69 @@ body {
     min-width: 80px;
   }
 }
+
+
+/* Final geometry polish: give rectangular icons more breathing room and unify taskbar styling. */
+.desktop-shortcuts {
+  grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+  gap: 18px 12px;
+}
+
+.desktop-shortcut {
+  width: 108px;
+  min-height: 126px;
+  padding: 12px 8px;
+}
+
+.desktop-shortcut img {
+  width: 64px;
+  height: 52px;
+  max-width: 84%;
+  max-height: 60px;
+  object-fit: contain;
+}
+
+.desktop-shortcut span {
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.taskbar {
+  border-radius: 22px;
+  backdrop-filter: blur(28px) saturate(160%);
+  box-shadow: 0 16px 42px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.12), 0 0 0 1px rgba(78,245,255,.15);
+}
+
+.app-launcher-button,
+.pinned-app,
+.taskbar-window,
+.clock-button {
+  background: linear-gradient(160deg, rgba(8,25,42,.8), rgba(3,8,18,.92));
+  border: 1px solid rgba(117,240,255,.28);
+}
+
+.pinned-app:hover,
+.taskbar-window:hover,
+.clock-button:hover,
+.app-launcher-button:hover {
+  border-color: rgba(117,240,255,.7);
+  box-shadow: 0 0 16px rgba(117,240,255,.22);
+}
+
+@media (max-width: 900px) {
+  .desktop-shortcuts {
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 12px 8px;
+  }
+
+  .desktop-shortcut {
+    width: auto;
+    min-height: 112px;
+    padding: 10px 6px;
+  }
+
+  .desktop-shortcut img {
+    width: 58px;
+    height: 46px;
+  }
+}
