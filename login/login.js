@@ -26,6 +26,7 @@ const togglePasswordBtn = document.getElementById("togglePasswordBtn");
 let flowState = "boot";
 let handoffTimer;
 let handoffCountdownTimer;
+let handoffWatchdogTimer;
 
 function configureViewportMode() {
   return applyViewportProfile({
@@ -66,6 +67,7 @@ function startCountdown(ms) {
 
 function finishHandoff() {
   window.clearTimeout(handoffTimer);
+  window.clearTimeout(handoffWatchdogTimer);
   window.clearInterval(handoffCountdownTimer);
   flowState = "handoff-complete";
   goToGame();
@@ -85,6 +87,7 @@ async function enterGameWithCutscene() {
   const delay = getHandoffDelay();
   startCountdown(delay);
   handoffTimer = window.setTimeout(finishHandoff, delay);
+  handoffWatchdogTimer = window.setTimeout(finishHandoff, delay + 3000);
 }
 
 let introDone = false;
@@ -205,6 +208,9 @@ onAuthStateChanged(auth, async (user) => {
   flowState = "auth";
   authPanel.classList.remove("hidden");
   setMode(false);
+  skipCutsceneBtn.disabled = false;
+  skipCutsceneBtn.textContent = "Skip cinematic and continue";
+  emailInput.focus();
 
   if (loggedOutFlag) {
     statusMsg.textContent = "Operator signed out. Blackline gate reset.";

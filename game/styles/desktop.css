@@ -174,7 +174,6 @@ button {
 .app-launcher-button,
 .pinned-app,
 .taskbar-window,
-.mobile-window-button,
 .mobile-window-button {
   min-width: 74px;
   height: 44px;
@@ -720,16 +719,13 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    min-width: 74px;
+    height: 44px;
+    border-radius: 14px;
+    font-weight: 800;
   }
 
-  .mobile-window-button {
-  min-width: 74px;
-  height: 44px;
-  border-radius: 14px;
-  font-weight: 800;
-}
-
-.clock-button {
+  .clock-button {
     min-width: 64px;
     padding-inline: 8px;
   }
@@ -858,7 +854,6 @@ body {
 .app-launcher-button,
 .pinned-app,
 .taskbar-window,
-.mobile-window-button,
 .mobile-window-button {
   min-width: 74px;
   height: 44px;
@@ -938,7 +933,6 @@ body {
 .app-launcher-button,
 .pinned-app,
 .taskbar-window,
-.mobile-window-button,
 .mobile-window-button {
   min-width: 74px;
   height: 44px;

@@ -2362,3 +2362,18 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .post-login-cutscene * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition: none !important; }
 }
+
+/* next wave: mobile keyboard-safe auth framing and clearer controls */
+.password-row .inline-ghost { min-height: 44px; }
+#skipCutsceneBtn { min-height: 44px; }
+
+@media (max-width: 720px) {
+  .auth-panel {
+    max-height: calc((var(--app-vh, 1vh) * 100) - 16px);
+    overflow: auto;
+  }
+
+  .auth-content {
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+  }
+}
