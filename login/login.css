@@ -2299,3 +2299,280 @@ body {
     font-size: clamp(1.7rem, 5vw, 3.8rem);
   }
 }
+
+/* 2026 ux refactor: reliable cinematic layers, mobile readability, and fast handoff controls */
+.password-row { display:flex; gap:8px; align-items:center; }
+.password-row input { flex:1; }
+.inline-ghost { min-width:72px; }
+.cutscene-actions { margin-top: 10px; }
+
+.post-login-cutscene .topography-field,
+.post-login-cutscene .europe-map { position: relative; overflow: hidden; isolation: isolate; }
+
+.post-login-cutscene .bomber,
+.post-login-cutscene .nuke-bomber,
+.post-login-cutscene .falling-nuke,
+.post-login-cutscene .mushroom-cloud { z-index: 6; opacity: 1 !important; visibility: visible !important; }
+
+.post-login-cutscene .nuke-bomber {
+  width: 126px !important;
+  height: 48px !important;
+  top: 19% !important;
+  left: -18% !important;
+  transform: translateZ(0);
+  animation: nukeBomberPassStable 8s linear infinite !important;
+}
+
+.post-login-cutscene .nuke-bomber::before,
+.post-login-cutscene .nuke-bomber::after {
+  content: "";
+  position: absolute;
+  background: linear-gradient(135deg, #d9f2ff, #7ac7ff);
+}
+.post-login-cutscene .nuke-bomber::before { inset: 16px 18px 18px 12px; clip-path: polygon(0 50%, 36% 0, 100% 12%, 92% 75%, 42% 100%); }
+.post-login-cutscene .nuke-bomber::after { width: 38px; height: 10px; right: 4px; top: 20px; clip-path: polygon(0 0, 100% 50%, 0 100%); }
+
+.post-login-cutscene .falling-nuke {
+  width: 16px !important;
+  height: 42px !important;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f2fbff, #7bd4ff 75%, #134a6d);
+  box-shadow: 0 0 18px rgba(146, 216, 255, 0.65);
+  animation: nukeDropStable 8s linear infinite !important;
+}
+
+@keyframes nukeBomberPassStable {
+  0% { left: -18%; top: 17%; }
+  45% { left: 48%; top: 26%; }
+  100% { left: 118%; top: 36%; }
+}
+@keyframes nukeDropStable {
+  0%, 42% { opacity: 0; transform: translate(0, -20px); }
+  52% { opacity: 1; transform: translate(0, 0); }
+  100% { opacity: 0; transform: translate(165px, 240px); }
+}
+
+@media (max-width: 720px) {
+  .screen { gap: 10px; }
+  .post-login-cutscene { padding: 10px; }
+  .cutscene-actions .ghost-btn { width: 100%; min-height: 46px; }
+  .nuke-bomber { transform: scale(0.85); transform-origin: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .post-login-cutscene * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition: none !important; }
+}
+
+/* next wave: mobile keyboard-safe auth framing and clearer controls */
+.password-row .inline-ghost { min-height: 44px; }
+#skipCutsceneBtn { min-height: 44px; }
+
+@media (max-width: 720px) {
+  .auth-panel {
+    max-height: calc((var(--app-vh, 1vh) * 100) - 16px);
+    overflow: auto;
+  }
+
+  .auth-content {
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+  }
+}
+
+.field-hint {
+  display: block;
+  margin-top: 6px;
+  color: var(--amber);
+  font-size: 0.75rem;
+}
+
+.plain-status {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  min-height: 1.1em;
+}
+
+@media (max-width: 720px) {
+  body {
+    overflow-y: auto;
+  }
+
+  .orbital-ring,
+  .tactical-svg,
+  .scan-beam {
+    opacity: 0.45;
+  }
+
+  .ghost-btn,
+  .actions button,
+  .inline-ghost {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after,
+  .starfield,
+  .scan-beam,
+  .orbital-ring,
+  .tactical-svg path {
+    animation: none !important;
+  }
+}
+
+/* massive wave: login/accessibility/perf/mobile parity */
+.auth-panel,
+.intro-panel,
+.post-login-cutscene {
+  will-change: transform, opacity;
+}
+
+input,
+button {
+  outline-offset: 2px;
+}
+
+input:focus-visible,
+button:focus-visible {
+  outline: 2px solid rgba(115, 247, 255, 0.85);
+}
+
+#status {
+  margin-bottom: 2px;
+}
+
+#plainStatus {
+  opacity: 0.92;
+}
+
+.password-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.password-row input {
+  min-width: 0;
+}
+
+.inline-ghost {
+  min-width: 74px;
+}
+
+.cutscene-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.asset-status,
+.asset-percent {
+  letter-spacing: 0.08em;
+}
+
+.cutscene-phase h2 {
+  text-wrap: balance;
+}
+
+.field label {
+  font-weight: 700;
+}
+
+@media (max-width: 980px) {
+  .screen {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .threat-column {
+    display: none;
+  }
+
+  .panel {
+    width: 100%;
+  }
+
+  .intro-panel {
+    min-height: 320px;
+  }
+}
+
+@media (max-width: 720px) {
+  body {
+    min-height: calc(var(--app-vh, 1vh) * 100);
+    overflow-x: hidden;
+  }
+
+  .panel {
+    clip-path: none;
+    border-radius: 18px;
+    padding: 16px;
+  }
+
+  .panel::before,
+  .panel-frame,
+  .corner {
+    display: none;
+  }
+
+  .intro-panel h2,
+  .auth-content h1,
+  .phase-copy h2 {
+    letter-spacing: 0.06em;
+  }
+
+  .auth-grid {
+    display: block;
+  }
+
+  .identity-stack {
+    margin-bottom: 10px;
+  }
+
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .field input,
+  .actions button,
+  .ghost-btn,
+  #skipCutsceneBtn {
+    min-height: 46px;
+  }
+
+  .post-login-cutscene {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    min-height: auto;
+  }
+
+  .loading-sidebar {
+    order: -1;
+  }
+
+  .phase-copy {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .auth-content h1 {
+    font-size: 1.35rem;
+  }
+
+  .subtitle {
+    font-size: 0.86rem;
+  }
+
+  .field label {
+    font-size: 0.75rem;
+  }
+
+  .asset-percent {
+    font-size: 0.76rem;
+  }
+}

@@ -19,6 +19,17 @@ const postLoginCutscene = document.getElementById("postLoginCutscene");
 const introPanel = document.getElementById("intro");
 const subtitle = document.getElementById("subtitle");
 const gameplayTip = document.getElementById("gameplayTip");
+const skipCutsceneBtn = document.getElementById("skipCutsceneBtn");
+const assetPercent = document.getElementById("assetPercent");
+const togglePasswordBtn = document.getElementById("togglePasswordBtn");
+const capsHint = document.getElementById("capsHint");
+const plainStatus = document.getElementById("plainStatus");
+
+let flowState = "boot";
+const LAST_MODE_KEY = "terminalwar_auth_mode";
+let handoffTimer;
+let handoffCountdownTimer;
+let handoffWatchdogTimer;
 
 function configureViewportMode() {
   return applyViewportProfile({
@@ -42,27 +53,48 @@ function wait(ms) {
 }
 
 function getHandoffDelay() {
-  return UI_CONFIG.login.handoffDelayMs;
+  const prefersReducedMotion = window.matchMedia?.(UI_CONFIG.accessibility.reducedMotionQuery)?.matches;
+  const deviceMode = document.body.dataset.device;
+  const base = prefersReducedMotion || deviceMode === "mobile" ? UI_CONFIG.login.minHandoffDelayMs : UI_CONFIG.login.handoffDelayMs;
+  return Math.max(UI_CONFIG.login.minHandoffDelayMs, base);
+}
+
+function startCountdown(ms) {
+  window.clearInterval(handoffCountdownTimer);
+  const startedAt = Date.now();
+  handoffCountdownTimer = window.setInterval(() => {
+    const left = Math.max(0, Math.ceil((ms - (Date.now() - startedAt)) / 1000));
+    assetPercent.textContent = `SECURE HANDOFF // ${String(left).padStart(2, "0")} SEC`;
+  }, 250);
+}
+
+function finishHandoff() {
+  window.clearTimeout(handoffTimer);
+  window.clearTimeout(handoffWatchdogTimer);
+  window.clearInterval(handoffCountdownTimer);
+  flowState = "handoff-complete";
+  goToGame();
 }
 
 async function enterGameWithCutscene() {
-  if (transferStarted) return;
-  transferStarted = true;
+  if (flowState === "handoff" || flowState === "handoff-complete") return;
+  flowState = "handoff";
 
-  statusMsg.textContent = "Clearance accepted. Opening war-room uplink...";
+  setStatus("Clearance accepted. Opening war-room uplink...", "Loading game environment...");
   authPanel.classList.add("hidden");
   introPanel.classList.add("hidden");
   postLoginCutscene.classList.remove("hidden");
   document.body.dataset.sequence = "handoff";
   gameplayTip.textContent = gameplayTips[Math.floor(Math.random() * gameplayTips.length)];
 
-  await wait(getHandoffDelay());
-  goToGame();
+  const delay = getHandoffDelay();
+  startCountdown(delay);
+  handoffTimer = window.setTimeout(finishHandoff, delay);
+  handoffWatchdogTimer = window.setTimeout(finishHandoff, delay + 3000);
 }
 
 let introDone = false;
 let isSignupMode = false;
-let transferStarted = false;
 startMatrixRain();
 
 const params = new URLSearchParams(window.location.search);
@@ -76,24 +108,30 @@ function setMode(signupMode) {
   passwordInput.autocomplete = signupMode ? "new-password" : "current-password";
   switchBtn.textContent = signupMode ? "Return to Operator Authorization" : "Request New Blackline Callsign";
   subtitle.textContent = signupMode ? "Enroll a cleared asset into the Sector 204 command ledger." : "Unauthorized presence detected. Prove clearance before the grid notices.";
-  statusMsg.textContent = signupMode ? "Awaiting asset registration packet." : "Ashfall uplink quiet. Secure gate standing by.";
+  setStatus(signupMode ? "Awaiting asset registration packet." : "Ashfall uplink quiet. Secure gate standing by.", signupMode ? "Sign up to continue." : "Sign in to continue.");
+  window.localStorage.setItem(LAST_MODE_KEY, signupMode ? "signup" : "login");
+}
+
+function setStatus(themed, plain = "") {
+  statusMsg.textContent = themed;
+  plainStatus.textContent = plain;
 }
 
 function mapAuthError(errorCode) {
   switch (errorCode) {
     case "auth/wrong-password":
     case "auth/invalid-credential":
-      return "Cipher key rejected by blackline command.";
+      return ["Cipher key rejected by blackline command.", "Wrong password. Please try again."];
     case "auth/user-not-found":
-      return "No cleared operator found in the ghost ledger.";
+      return ["No cleared operator found in the ghost ledger.", "No account found for that email."];
     case "auth/email-already-in-use":
-      return "Command channel already bound to a cleared asset.";
+      return ["Command channel already bound to a cleared asset.", "That email is already in use."];
     case "auth/weak-password":
-      return "Cipher key too weak. Use at least 6 characters.";
+      return ["Cipher key too weak. Use at least 6 characters.", "Password must be at least 6 characters."];
     case "auth/invalid-email":
-      return "Command channel must be a valid email address.";
+      return ["Command channel must be a valid email address.", "Please enter a valid email address."];
     default:
-      return "Access denied by strategic gate. Retry.";
+      return ["Access denied by strategic gate. Retry.", "Login failed. Please try again."];
   }
 }
 
@@ -105,28 +143,68 @@ function setAuthButtonsDisabled(disabled) {
 
 switchBtn.addEventListener("click", () => setMode(!isSignupMode));
 
+emailInput.addEventListener("keydown", async (event) => {
+  if (event.key !== "Enter") return;
+  event.preventDefault();
+  if (isSignupMode) usernameInput.focus();
+  else await loginBtn.click();
+});
+
+usernameInput.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter") return;
+  event.preventDefault();
+  emailInput.focus();
+});
+
+togglePasswordBtn?.addEventListener("click", () => {
+  const nextType = passwordInput.type === "password" ? "text" : "password";
+  passwordInput.type = nextType;
+  togglePasswordBtn.textContent = nextType === "password" ? "Show" : "Hide";
+  togglePasswordBtn.setAttribute("aria-pressed", String(nextType === "text"));
+});
+
+skipCutsceneBtn?.addEventListener("click", async () => {
+  if (flowState !== "handoff") return;
+  skipCutsceneBtn.disabled = true;
+  skipCutsceneBtn.textContent = "Continuing...";
+  await wait(UI_CONFIG.login.skipDelayMs);
+  finishHandoff();
+});
+
 forceLogoutBtn.addEventListener("click", async () => {
   await signOut(auth);
-  statusMsg.textContent = "Local clearance cache purged. Gate reset.";
+  setStatus("Local clearance cache purged. Gate reset.", "Signed out from this browser session.");
 });
+
+async function doAuth(action) {
+  setAuthButtonsDisabled(true);
+  const activeButton = isSignupMode ? signupBtn : loginBtn;
+  activeButton.dataset.originalText = activeButton.textContent;
+  activeButton.textContent = isSignupMode ? "Enrolling..." : "Authorizing...";
+  try {
+    await action();
+    await enterGameWithCutscene();
+    const activeButton = isSignupMode ? signupBtn : loginBtn;
+    if (activeButton?.dataset.originalText) activeButton.textContent = activeButton.dataset.originalText;
+  } catch (error) {
+    const [themed, plain] = mapAuthError(error.code);
+    setStatus(themed, plain);
+    setAuthButtonsDisabled(false);
+    const activeButton = isSignupMode ? signupBtn : loginBtn;
+    if (activeButton?.dataset.originalText) activeButton.textContent = activeButton.dataset.originalText;
+  }
+}
 
 loginBtn.addEventListener("click", async () => {
   const email = emailInput.value.trim();
   const password = passwordInput.value;
   if (!email || !password) {
-    statusMsg.textContent = "Command channel and cipher key required.";
+    setStatus("Command channel and cipher key required.", "Enter both email and password.");
     return;
   }
 
-  setAuthButtonsDisabled(true);
-  statusMsg.textContent = "Verifying operator clearance...";
-  try {
-    await login(email, password);
-    await enterGameWithCutscene();
-  } catch (error) {
-    statusMsg.textContent = mapAuthError(error.code);
-    setAuthButtonsDisabled(false);
-  }
+  setStatus("Verifying operator clearance...", "Signing in...");
+  await doAuth(() => login(email, password));
 });
 
 signupBtn.addEventListener("click", async () => {
@@ -134,34 +212,47 @@ signupBtn.addEventListener("click", async () => {
   const email = emailInput.value.trim();
   const password = passwordInput.value;
   if (!username || !email || !password) {
-    statusMsg.textContent = "Callsign, channel, and cipher key required.";
+    setStatus("Callsign, channel, and cipher key required.", "Enter username, email, and password.");
     return;
   }
 
-  setAuthButtonsDisabled(true);
-  statusMsg.textContent = "Registering cleared blackline asset...";
-  try {
-    await signUp(email, password, username);
-    await enterGameWithCutscene();
-  } catch (error) {
-    statusMsg.textContent = mapAuthError(error.code);
-    setAuthButtonsDisabled(false);
-  }
+  setStatus("Registering cleared blackline asset...", "Creating your account...");
+  await doAuth(() => signUp(email, password, username));
+});
+
+passwordInput.addEventListener("keydown", async (event) => {
+  if (event.key !== "Enter") return;
+  event.preventDefault();
+  if (isSignupMode) await signupBtn.click();
+  else await loginBtn.click();
+});
+
+
+passwordInput.addEventListener("keyup", (event) => {
+  const isCaps = event.getModifierState?.("CapsLock") || false;
+  capsHint?.classList.toggle("hidden", !isCaps);
 });
 
 onAuthStateChanged(auth, async (user) => {
   if (user && !loggedOutFlag) return enterGameWithCutscene();
 
   if (!introDone) {
+    flowState = "intro";
     await runIntro();
     introDone = true;
   }
 
+  flowState = "auth";
   authPanel.classList.remove("hidden");
-  setMode(false);
+  const rememberedMode = window.localStorage.getItem(LAST_MODE_KEY);
+  setMode(rememberedMode === "signup");
+  skipCutsceneBtn.disabled = false;
+  skipCutsceneBtn.textContent = "Skip cinematic and continue";
+  if (rememberedMode === "signup") usernameInput.focus();
+  else emailInput.focus();
 
   if (loggedOutFlag) {
-    statusMsg.textContent = "Operator signed out. Blackline gate reset.";
+    setStatus("Operator signed out. Blackline gate reset.", "You are logged out.");
     replaceLoginUrl();
   }
 });
