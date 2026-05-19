@@ -777,3 +777,82 @@ body {
     height: 24px;
   }
 }
+
+
+/* 2026-05 shell polish: cleaner floating taskbar and improved icon legibility. */
+.desktop-shortcuts {
+  gap: 16px 10px;
+  align-content: start;
+}
+
+.desktop-shortcut {
+  min-height: 112px;
+  padding: 10px 6px;
+}
+
+.desktop-shortcut img {
+  width: 56px;
+  height: 56px;
+  image-rendering: auto;
+}
+
+.desktop-shortcut span {
+  font-size: .84rem;
+  line-height: 1.08;
+}
+
+.desktop-lore-card {
+  display: none !important;
+}
+
+.taskbar {
+  left: max(10px, env(safe-area-inset-left));
+  right: max(10px, env(safe-area-inset-right));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  border-radius: 18px;
+  clip-path: none;
+  height: 66px;
+  padding: 8px 10px;
+  gap: 8px;
+  border: 1px solid rgba(127,245,255,.28);
+  background: linear-gradient(180deg, rgba(14,24,38,.88), rgba(2,5,12,.92));
+}
+
+.app-launcher-button,
+.pinned-app,
+.taskbar-window,
+.clock-button {
+  clip-path: none;
+  border-radius: 12px;
+}
+
+.pinned-app,
+.taskbar-window {
+  width: 46px;
+  min-width: 46px;
+  height: 46px;
+  padding: 0;
+}
+
+.taskbar-window span {
+  display: none;
+}
+
+.pinned-app img,
+.taskbar-window img {
+  width: 30px;
+  height: 30px;
+}
+
+@media (max-width: 900px) {
+  .desktop-shortcuts {
+    width: 100%;
+    grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
+  }
+
+  .taskbar-window-strip {
+    display: flex;
+    flex: 1;
+    min-width: 80px;
+  }
+}

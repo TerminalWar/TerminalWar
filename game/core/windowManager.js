@@ -49,14 +49,19 @@ function getViewportBounds() {
   };
 }
 
+function isSmallTouchLayout() {
+  return window.innerWidth <= UI_CONFIG.windows.mobileBreakpoint;
+}
+
 function shouldMobileMaximize() {
-  return UI_CONFIG.windows.mobileMaximizedByDefault && window.innerWidth <= UI_CONFIG.windows.mobileBreakpoint;
+  return UI_CONFIG.windows.mobileMaximizedByDefault && isSmallTouchLayout();
 }
 
 function makeDraggable(windowEl, handle) {
   let dragState = null;
 
   handle.addEventListener("pointerdown", (event) => {
+    if (isSmallTouchLayout()) return;
     if (event.button !== 0 || windowEl.classList.contains("is-maximized")) return;
     setActiveWindow(windowEl.dataset.windowId);
     const rect = windowEl.getBoundingClientRect();
@@ -100,6 +105,7 @@ function syncBaseRouteIfEmpty(updateRoute = true) {
 
 
 function minimizeWindow(windowId) {
+  if (isSmallTouchLayout()) return;
   const record = desktopState.openWindows.get(windowId);
   if (!record) return;
   record.element.hidden = true;

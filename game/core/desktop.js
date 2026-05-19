@@ -14,14 +14,6 @@ function buildWallpaperStyle() {
   return `${glows}, linear-gradient(135deg, rgba(4, 10, 24, 0.92), rgba(18, 5, 35, 0.88)), repeating-linear-gradient(90deg, rgba(255,255,255,.045) 0 1px, transparent 1px ${GAME_CONFIG.wallpaper.gridSize}px), repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0 1px, transparent 1px ${GAME_CONFIG.wallpaper.gridSize}px)`;
 }
 
-function createLoreCard() {
-  return createElement("section", { className: "desktop-lore-card" }, [
-    createElement("p", { className: "eyebrow", text: `${GAME_CONFIG.osName} // ${GAME_CONFIG.sectorName}` }),
-    createElement("h1", { text: GAME_CONFIG.title }),
-    createElement("p", { text: GAME_CONFIG.bootMessage })
-  ]);
-}
-
 function createShortcut(app, notify) {
   const access = getAppAccess(app, desktopState.playerProfile);
   const button = createElement("button", {
@@ -58,7 +50,6 @@ export function renderDesktop(desktopEl, { showToast } = {}) {
 
   desktopEl.replaceChildren(
     createElement("div", { className: "desktop-overlay", attributes: { "aria-hidden": "true" } }),
-    createLoreCard(),
     shortcutArea
   );
 }
