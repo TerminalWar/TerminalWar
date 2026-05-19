@@ -2377,3 +2377,46 @@ body {
     padding-bottom: max(14px, env(safe-area-inset-bottom));
   }
 }
+
+.field-hint {
+  display: block;
+  margin-top: 6px;
+  color: var(--amber);
+  font-size: 0.75rem;
+}
+
+.plain-status {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  min-height: 1.1em;
+}
+
+@media (max-width: 720px) {
+  body {
+    overflow-y: auto;
+  }
+
+  .orbital-ring,
+  .tactical-svg,
+  .scan-beam {
+    opacity: 0.45;
+  }
+
+  .ghost-btn,
+  .actions button,
+  .inline-ghost {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after,
+  .starfield,
+  .scan-beam,
+  .orbital-ring,
+  .tactical-svg path {
+    animation: none !important;
+  }
+}
