@@ -92,6 +92,40 @@ function makeDraggable(windowEl, handle) {
   handle.addEventListener("pointercancel", endDrag);
 }
 
+
+function clampWindowToViewport(windowEl) {
+  if (windowEl.classList.contains("is-maximized")) return;
+  const bounds = getViewportBounds();
+  const rect = windowEl.getBoundingClientRect();
+  const maxLeft = bounds.width - windowEl.offsetWidth - bounds.gap;
+  const maxTop = bounds.usableBottom - windowEl.offsetHeight;
+  windowEl.style.left = `${constrainPosition(rect.left, bounds.gap, maxLeft)}px`;
+  windowEl.style.top = `${constrainPosition(rect.top, bounds.gap, maxTop)}px`;
+}
+
+function snapWindow(windowEl, direction) {
+  if (shouldMobileMaximize()) return;
+  const bounds = getViewportBounds();
+  const gap = bounds.gap;
+  const halfWidth = Math.floor((bounds.width - gap * 3) / 2);
+  windowEl.classList.remove("is-maximized");
+  if (direction === "left") {
+    Object.assign(windowEl.style, {
+      left: `${gap}px`,
+      top: `${gap}px`,
+      width: `${halfWidth}px`,
+      height: `${bounds.usableBottom - gap}px`
+    });
+  } else if (direction === "right") {
+    Object.assign(windowEl.style, {
+      left: `${halfWidth + gap * 2}px`,
+      top: `${gap}px`,
+      width: `${halfWidth}px`,
+      height: `${bounds.usableBottom - gap}px`
+    });
+  }
+}
+
 function stopWindowControlEvent(event) {
   event.stopPropagation();
 }
@@ -206,6 +240,7 @@ export async function openAppWindow(appConfig, { updateRoute = true } = {}) {
 
   makeDraggable(windowEl, titlebar);
   windowEl.addEventListener("pointerdown", () => setActiveWindow(windowId));
+  windowEl.addEventListener("dblclick", () => toggleMaximize(windowEl));
   controls.addEventListener("pointerdown", stopWindowControlEvent);
   controls.addEventListener("click", stopWindowControlEvent);
   windowEl.querySelector('[data-action="close"]').addEventListener("click", (event) => {
@@ -222,6 +257,7 @@ export async function openAppWindow(appConfig, { updateRoute = true } = {}) {
   });
 
   desktopElement.append(windowEl);
+  clampWindowToViewport(windowEl);
   desktopState.openWindows.set(windowId, { id: windowId, app: appConfig, element: windowEl });
   setActiveWindow(windowId);
 
@@ -257,3 +293,21 @@ export function restoreWindow(windowId) {
 export function getOpenWindowRecords() {
   return Array.from(desktopState.openWindows.values());
 }
+
+window.addEventListener("resize", () => {
+  for (const record of desktopState.openWindows.values()) clampWindowToViewport(record.element);
+}, { passive: true });
+
+window.addEventListener("keydown", (event) => {
+  if (!desktopState.activeWindowId) return;
+  const active = desktopState.openWindows.get(desktopState.activeWindowId);
+  if (!active) return;
+  if (event.altKey && event.key === "ArrowLeft") {
+    event.preventDefault();
+    snapWindow(active.element, "left");
+  }
+  if (event.altKey && event.key === "ArrowRight") {
+    event.preventDefault();
+    snapWindow(active.element, "right");
+  }
+});

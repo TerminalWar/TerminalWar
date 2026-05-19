@@ -26,6 +26,7 @@ const capsHint = document.getElementById("capsHint");
 const plainStatus = document.getElementById("plainStatus");
 
 let flowState = "boot";
+const LAST_MODE_KEY = "terminalwar_auth_mode";
 let handoffTimer;
 let handoffCountdownTimer;
 let handoffWatchdogTimer;
@@ -52,7 +53,7 @@ function wait(ms) {
 }
 
 function getHandoffDelay() {
-  const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+  const prefersReducedMotion = window.matchMedia?.(UI_CONFIG.accessibility.reducedMotionQuery)?.matches;
   const deviceMode = document.body.dataset.device;
   const base = prefersReducedMotion || deviceMode === "mobile" ? UI_CONFIG.login.minHandoffDelayMs : UI_CONFIG.login.handoffDelayMs;
   return Math.max(UI_CONFIG.login.minHandoffDelayMs, base);
@@ -108,6 +109,7 @@ function setMode(signupMode) {
   switchBtn.textContent = signupMode ? "Return to Operator Authorization" : "Request New Blackline Callsign";
   subtitle.textContent = signupMode ? "Enroll a cleared asset into the Sector 204 command ledger." : "Unauthorized presence detected. Prove clearance before the grid notices.";
   setStatus(signupMode ? "Awaiting asset registration packet." : "Ashfall uplink quiet. Secure gate standing by.", signupMode ? "Sign up to continue." : "Sign in to continue.");
+  window.localStorage.setItem(LAST_MODE_KEY, signupMode ? "signup" : "login");
 }
 
 function setStatus(themed, plain = "") {
@@ -140,6 +142,19 @@ function setAuthButtonsDisabled(disabled) {
 }
 
 switchBtn.addEventListener("click", () => setMode(!isSignupMode));
+
+emailInput.addEventListener("keydown", async (event) => {
+  if (event.key !== "Enter") return;
+  event.preventDefault();
+  if (isSignupMode) usernameInput.focus();
+  else await loginBtn.click();
+});
+
+usernameInput.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter") return;
+  event.preventDefault();
+  emailInput.focus();
+});
 
 togglePasswordBtn?.addEventListener("click", () => {
   const nextType = passwordInput.type === "password" ? "text" : "password";
@@ -229,10 +244,12 @@ onAuthStateChanged(auth, async (user) => {
 
   flowState = "auth";
   authPanel.classList.remove("hidden");
-  setMode(false);
+  const rememberedMode = window.localStorage.getItem(LAST_MODE_KEY);
+  setMode(rememberedMode === "signup");
   skipCutsceneBtn.disabled = false;
   skipCutsceneBtn.textContent = "Skip cinematic and continue";
-  emailInput.focus();
+  if (rememberedMode === "signup") usernameInput.focus();
+  else emailInput.focus();
 
   if (loggedOutFlag) {
     setStatus("Operator signed out. Blackline gate reset.", "You are logged out.");

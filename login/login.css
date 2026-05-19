@@ -2420,3 +2420,159 @@ body {
     animation: none !important;
   }
 }
+
+/* massive wave: login/accessibility/perf/mobile parity */
+.auth-panel,
+.intro-panel,
+.post-login-cutscene {
+  will-change: transform, opacity;
+}
+
+input,
+button {
+  outline-offset: 2px;
+}
+
+input:focus-visible,
+button:focus-visible {
+  outline: 2px solid rgba(115, 247, 255, 0.85);
+}
+
+#status {
+  margin-bottom: 2px;
+}
+
+#plainStatus {
+  opacity: 0.92;
+}
+
+.password-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.password-row input {
+  min-width: 0;
+}
+
+.inline-ghost {
+  min-width: 74px;
+}
+
+.cutscene-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.asset-status,
+.asset-percent {
+  letter-spacing: 0.08em;
+}
+
+.cutscene-phase h2 {
+  text-wrap: balance;
+}
+
+.field label {
+  font-weight: 700;
+}
+
+@media (max-width: 980px) {
+  .screen {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .threat-column {
+    display: none;
+  }
+
+  .panel {
+    width: 100%;
+  }
+
+  .intro-panel {
+    min-height: 320px;
+  }
+}
+
+@media (max-width: 720px) {
+  body {
+    min-height: calc(var(--app-vh, 1vh) * 100);
+    overflow-x: hidden;
+  }
+
+  .panel {
+    clip-path: none;
+    border-radius: 18px;
+    padding: 16px;
+  }
+
+  .panel::before,
+  .panel-frame,
+  .corner {
+    display: none;
+  }
+
+  .intro-panel h2,
+  .auth-content h1,
+  .phase-copy h2 {
+    letter-spacing: 0.06em;
+  }
+
+  .auth-grid {
+    display: block;
+  }
+
+  .identity-stack {
+    margin-bottom: 10px;
+  }
+
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .field input,
+  .actions button,
+  .ghost-btn,
+  #skipCutsceneBtn {
+    min-height: 46px;
+  }
+
+  .post-login-cutscene {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    min-height: auto;
+  }
+
+  .loading-sidebar {
+    order: -1;
+  }
+
+  .phase-copy {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .auth-content h1 {
+    font-size: 1.35rem;
+  }
+
+  .subtitle {
+    font-size: 0.86rem;
+  }
+
+  .field label {
+    font-size: 0.75rem;
+  }
+
+  .asset-percent {
+    font-size: 0.76rem;
+  }
+}

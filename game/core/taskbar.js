@@ -34,6 +34,7 @@ function togglePanel(panel, force) {
   refs.startMenu.hidden = true;
   refs.clockPanel.hidden = true;
   panel.hidden = !shouldOpen;
+  if (!panel.hidden) panel.setAttribute("data-opened-at", String(Date.now()));
 }
 
 function buildAppButton(app, className) {
@@ -136,6 +137,7 @@ export function refreshTaskbarWindows() {
   refs.windowStrip.replaceChildren();
   const openRecords = getOpenWindowRecords();
   refs.mobileWindowButton.textContent = `Apps ${openRecords.length}`;
+  refs.mobileWindowButton.title = `${openRecords.length} open app window${openRecords.length === 1 ? "" : "s"}`;
   for (const record of openRecords) {
     const button = createElement("button", {
       type: "button",
@@ -171,6 +173,7 @@ export function initTaskbar({ taskbar, startMenu, clockPanel, showToast }) {
 
   refs.launcher.addEventListener("click", () => togglePanel(refs.startMenu));
   refs.mobileWindowButton.addEventListener("click", () => togglePanel(refs.startMenu, true));
+  refs.mobileWindowButton.addEventListener("contextmenu", (event) => { event.preventDefault(); togglePanel(refs.startMenu); });
   refs.clockButton.addEventListener("click", () => {
     renderClockPanel();
     togglePanel(refs.clockPanel);

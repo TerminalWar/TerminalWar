@@ -1009,3 +1009,177 @@ body {
   outline: 2px solid rgba(0, 245, 255, 0.9);
   outline-offset: 2px;
 }
+
+/* massive wave: desktop parity, mobile ergonomics, visibility and accessibility */
+.toast-warn {
+  border-color: rgba(255, 182, 70, 0.75);
+  box-shadow: 0 0 18px rgba(255, 182, 70, 0.25);
+}
+
+.toast-info {
+  border-color: rgba(115, 247, 255, 0.62);
+}
+
+.start-menu,
+.clock-panel {
+  max-height: min(74vh, 660px);
+  overflow: auto;
+}
+
+.start-app,
+.taskbar-window,
+.pinned-app,
+.mobile-window-button,
+.clock-button,
+.app-launcher-button {
+  transition: transform 120ms ease, box-shadow 160ms ease, border-color 160ms ease, background-color 160ms ease;
+}
+
+.start-app:active,
+.taskbar-window:active,
+.pinned-app:active,
+.mobile-window-button:active,
+.clock-button:active,
+.app-launcher-button:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.window-titlebar {
+  touch-action: none;
+}
+
+.app-window {
+  max-width: calc(100vw - 16px);
+  max-height: calc(100vh - var(--taskbar-height) - 16px);
+}
+
+.app-window.is-maximized {
+  border-radius: 14px;
+}
+
+.window-controls button {
+  min-width: 36px;
+}
+
+.window-controls button[data-action="close"] {
+  color: #ffd5de;
+}
+
+.window-controls button[data-action="close"]:hover {
+  background: rgba(255, 61, 102, 0.2);
+}
+
+.desktop-shortcut {
+  backdrop-filter: blur(1.5px);
+}
+
+.desktop-shortcut:focus-visible span,
+.desktop-shortcut:hover span {
+  text-shadow: 0 0 10px rgba(0, 245, 255, 0.45);
+}
+
+@media (max-width: 980px) {
+  .taskbar {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .clock-button {
+    min-width: 84px;
+  }
+
+  .taskbar-window {
+    min-width: 96px;
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 720px) {
+  :root {
+    --taskbar-height: 68px;
+  }
+
+  .desktop {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .desktop-lore-card h1 {
+    font-size: clamp(1.55rem, 8vw, 2.4rem);
+    letter-spacing: -0.04em;
+  }
+
+  .desktop-lore-card p {
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }
+
+  .desktop-shortcuts {
+    gap: 10px;
+    padding-bottom: 8px;
+  }
+
+  .desktop-shortcut {
+    min-height: 96px;
+    padding: 8px 4px;
+    border-radius: 12px;
+  }
+
+  .desktop-shortcut img {
+    width: 42px;
+    height: 42px;
+  }
+
+  .desktop-shortcut span {
+    font-size: 0.74rem;
+  }
+
+  .taskbar-window-strip,
+  .pinned-apps {
+    display: none;
+  }
+
+  .mobile-window-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-width: 104px;
+  }
+
+  .app-launcher-button,
+  .mobile-window-button,
+  .clock-button {
+    min-height: 48px;
+  }
+
+  .start-menu,
+  .clock-panel {
+    left: 10px;
+    right: 10px;
+    width: auto;
+    bottom: calc(var(--taskbar-height) + 16px);
+    max-height: 62vh;
+    border-radius: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desktop::before,
+  .desktop::after,
+  .desktop-overlay,
+  .taskbar,
+  .desktop-shortcut,
+  .taskbar-window,
+  .pinned-app,
+  .clock-button,
+  .app-launcher-button,
+  .mobile-window-button {
+    transition: none !important;
+    animation: none !important;
+  }
+}

@@ -28,11 +28,15 @@ export const UI_CONFIG = {
     compactColumns: 5
   },
   toast: {
-    durationMs: 3400
+    durationMs: 3800,
+    maxVisible: 3
   },
   login: {
-    handoffDelayMs: 8000,
-    minHandoffDelayMs: 2800,
-    skipDelayMs: 400
+    handoffDelayMs: 7000,
+    minHandoffDelayMs: 2200,
+    skipDelayMs: 250
+  },
+  accessibility: {
+    reducedMotionQuery: "(prefers-reduced-motion: reduce)"
   }
 };

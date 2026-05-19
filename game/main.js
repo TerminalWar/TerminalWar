@@ -24,9 +24,11 @@ function configureViewport() {
   });
 }
 
-function showToast(message) {
+function showToast(message, level = "info") {
+  const active = toastRegion.querySelectorAll(".toast");
+  if (active.length >= UI_CONFIG.toast.maxVisible) active[0].remove();
   const toast = document.createElement("div");
-  toast.className = "toast";
+  toast.className = `toast toast-${level}`;
   toast.textContent = message;
   toastRegion.append(toast);
   window.setTimeout(() => toast.remove(), UI_CONFIG.toast.durationMs);
@@ -41,7 +43,7 @@ function tryOpenRouteApp({ updateRoute = false } = {}) {
 
   const routedApp = getAppBySlug(routeSlug);
   if (!routedApp) {
-    showToast(`Unknown app route: /game/${routeSlug}/`);
+    showToast(`Unknown app route: /game/${routeSlug}/`, "warn");
     window.history.replaceState({}, "", "/game/");
     closeAllWindows({ updateRoute: false });
     return;
@@ -49,7 +51,7 @@ function tryOpenRouteApp({ updateRoute = false } = {}) {
 
   const access = getAppAccess(routedApp, desktopState.playerProfile);
   if (!access.canOpen) {
-    showToast(`${routedApp.shortName} is locked. ${access.reason}.`);
+    showToast(`${routedApp.shortName} is locked. ${access.reason}.`, "warn");
     window.history.replaceState({}, "", "/game/");
     closeAllWindows({ updateRoute: false });
     return;
@@ -73,7 +75,7 @@ async function bootDesktop(user) {
     refreshTaskbarWindows();
   } catch (error) {
     console.warn("Firebase player datastore sync failed", error);
-    showToast("Firebase profile sync is offline. Local desktop still booted.");
+    showToast("Firebase profile sync is offline. Local desktop still booted.", "warn");
   }
 
   tryOpenRouteApp({ updateRoute: false });
@@ -94,4 +96,11 @@ onAuthStateChanged(auth, (user) => {
   }
 
   bootDesktop(user);
+});
+
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    startMenu.hidden = true;
+    clockPanel.hidden = true;
+  }
 });
