@@ -1,19 +1,21 @@
+import { createElement } from "../../../shared/dom.js";
 import { TERMINAL_COMMAND_PREVIEW } from "./commands.js";
 import { createTemplateAppView } from "../_templateApp/ui.js";
 
 export function createTerminalView(appConfig) {
   const shell = createTemplateAppView(appConfig);
-  const commandRows = TERMINAL_COMMAND_PREVIEW.map(
-    (item) => `<div><code>${item.command}</code><span>${item.output}</span></div>`
-  ).join("");
-
-  shell.insertAdjacentHTML(
-    "beforeend",
-    `<section class="terminal-preview" aria-label="Future terminal command preview">
-      <div class="terminal-line"><span>root@gov-relic</span>:<b>~</b>$ help</div>
-      ${commandRows}
-    </section>`
-  );
-
+  const commandRows = TERMINAL_COMMAND_PREVIEW.map((item) => createElement("div", {}, [
+    createElement("code", { text: item.command }),
+    createElement("span", { text: item.output })
+  ]));
+  shell.append(createElement("section", { className: "terminal-preview", ariaLabel: "Future terminal command preview" }, [
+    createElement("div", { className: "terminal-line" }, [
+      createElement("span", { text: "root@gov-relic" }),
+      ":",
+      createElement("b", { text: "~" }),
+      "$ help"
+    ]),
+    commandRows
+  ]));
   return shell;
 }

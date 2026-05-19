@@ -1,33 +1,27 @@
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import { auth } from "../shared/firebase.js";
+import { applyViewportProfile } from "../shared/device.js";
 import { goToLogin } from "../shared/navigation.js";
 import { getAppBySlug, getRouteSlugFromLocation } from "./core/appLoader.js";
+import { getAppAccess } from "./core/appAccess.js";
 import { renderDesktop } from "./core/desktop.js";
-import { ensurePlayerGameProfile } from "./core/playerStore.js";
-import { setUser } from "./core/state.js";
+import { ensurePlayerGameProfile, mergePlayerProfile } from "./core/playerStore.js";
+import { desktopState, setPlayerProfile, setUser } from "./core/state.js";
 import { initTaskbar, refreshTaskbarWindows } from "./core/taskbar.js";
-import { initWindowManager, openAppWindow } from "./core/windowManager.js";
+import { closeAllWindows, initWindowManager, openAppWindow } from "./core/windowManager.js";
+import { UI_CONFIG } from "./config/ui.config.js";
 
 const desktop = document.getElementById("desktop");
 const taskbar = document.getElementById("taskbar");
 const startMenu = document.getElementById("startMenu");
 const clockPanel = document.getElementById("clockPanel");
 const toastRegion = document.getElementById("toastRegion");
-const mobileBlocker = document.getElementById("mobileBlocker");
 
-function isMobileDevice() {
-  const ua = navigator.userAgent || "";
-  const phoneOrTabletUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
-  const touchSmallScreen = (navigator.maxTouchPoints || 0) > 1 && Math.min(window.innerWidth, window.innerHeight) <= 900;
-  return phoneOrTabletUA || touchSmallScreen;
-}
-
-function lockMobilePlayers() {
-  if (!isMobileDevice()) return false;
-  document.documentElement.dataset.device = "mobile-blocked";
-  document.body.dataset.device = "mobile-blocked";
-  if (mobileBlocker) mobileBlocker.hidden = false;
-  return true;
+function configureViewport() {
+  return applyViewportProfile({
+    mobileMaxWidth: UI_CONFIG.windows.mobileBreakpoint,
+    compactMaxWidth: UI_CONFIG.windows.compactBreakpoint
+  });
 }
 
 function showToast(message) {
@@ -35,41 +29,65 @@ function showToast(message) {
   toast.className = "toast";
   toast.textContent = message;
   toastRegion.append(toast);
-  window.setTimeout(() => toast.remove(), 3000);
+  window.setTimeout(() => toast.remove(), UI_CONFIG.toast.durationMs);
 }
 
-function bootDesktop(user) {
-  if (lockMobilePlayers()) return;
+function tryOpenRouteApp({ updateRoute = false } = {}) {
+  const routeSlug = getRouteSlugFromLocation();
+  if (!routeSlug) {
+    closeAllWindows({ updateRoute: false });
+    return;
+  }
+
+  const routedApp = getAppBySlug(routeSlug);
+  if (!routedApp) {
+    showToast(`Unknown app route: /game/${routeSlug}/`);
+    window.history.replaceState({}, "", "/game/");
+    closeAllWindows({ updateRoute: false });
+    return;
+  }
+
+  const access = getAppAccess(routedApp, desktopState.playerProfile);
+  if (!access.canOpen) {
+    showToast(`${routedApp.shortName} is locked. ${access.reason}.`);
+    window.history.replaceState({}, "", "/game/");
+    closeAllWindows({ updateRoute: false });
+    return;
+  }
+
+  openAppWindow(routedApp, { updateRoute });
+}
+
+async function bootDesktop(user) {
+  configureViewport();
   setUser(user);
-  renderDesktop(desktop);
-  initWindowManager({ desktop, onWindowsChanged: refreshTaskbarWindows });
-  initTaskbar({ taskbar, startMenu, clockPanel });
-  ensurePlayerGameProfile(user).catch((error) => {
+  setPlayerProfile(mergePlayerProfile());
+  renderDesktop(desktop, { showToast });
+  initWindowManager({ desktop, onWindowsChanged: refreshTaskbarWindows, showToast });
+  initTaskbar({ taskbar, startMenu, clockPanel, showToast });
+
+  try {
+    const profile = await ensurePlayerGameProfile(user);
+    setPlayerProfile(profile);
+    renderDesktop(desktop, { showToast });
+    refreshTaskbarWindows();
+  } catch (error) {
     console.warn("Firebase player datastore sync failed", error);
     showToast("Firebase profile sync is offline. Local desktop still booted.");
-  });
-
-  const routeSlug = getRouteSlugFromLocation();
-  if (routeSlug) {
-    const routedApp = getAppBySlug(routeSlug);
-    if (routedApp) {
-      openAppWindow(routedApp, { updateRoute: false });
-    } else {
-      showToast(`Unknown app route: /game/${routeSlug}/`);
-      window.history.replaceState({}, "", "/game/");
-    }
   }
+
+  tryOpenRouteApp({ updateRoute: false });
 }
 
-window.addEventListener("popstate", () => {
-  const slug = getRouteSlugFromLocation();
-  const app = getAppBySlug(slug);
-  if (app) openAppWindow(app, { updateRoute: false });
-});
+window.addEventListener("resize", () => {
+  configureViewport();
+  refreshTaskbarWindows();
+}, { passive: true });
 
-if (lockMobilePlayers()) {
-  // The game is intentionally a laptop/PC desktop experience.
-} else onAuthStateChanged(auth, (user) => {
+window.addEventListener("popstate", () => tryOpenRouteApp({ updateRoute: false }));
+
+configureViewport();
+onAuthStateChanged(auth, (user) => {
   if (!user) {
     goToLogin();
     return;

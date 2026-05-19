@@ -251,7 +251,7 @@ code {
   }
 }
 
-/* AACR hard-surface app windows and three-second launch sequence. */
+/* AACR hard-surface app windows and configurable launch sequence. */
 .app-window {
   grid-template-rows: 48px 1fr;
   border-radius: 0;
@@ -393,4 +393,69 @@ code {
 
 @keyframes loaderSpin {
   to { transform: rotate(360deg); }
+}
+
+/* Responsive windows: maximized-by-default on small screens with touch-friendly controls. */
+@media (max-width: 720px) {
+  .app-window,
+  .app-window.is-maximized {
+    inset: 8px 8px calc(var(--taskbar-height) + max(14px, env(safe-area-inset-bottom))) 8px !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0;
+    min-height: 0;
+    resize: none;
+  }
+
+  .window-titlebar {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .window-title span {
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+  }
+
+  .window-controls button {
+    width: 38px;
+    height: 34px;
+  }
+
+  .window-content {
+    padding: 12px;
+  }
+
+  .app-launch-loader {
+    inset: 48px 0 0;
+    padding: 18px;
+  }
+
+  .app-hero {
+    grid-template-columns: 1fr;
+    padding: 14px;
+  }
+
+  .app-hero-icon {
+    width: 54px;
+    height: 54px;
+  }
+
+  .template-grid,
+  .terminal-preview div:not(.terminal-line) {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+.window-title img {
+  display: block;
+  object-fit: contain;
+  object-position: center;
 }

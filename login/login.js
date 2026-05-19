@@ -1,5 +1,7 @@
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { applyViewportProfile } from "../shared/device.js";
 import { auth } from "../shared/firebase.js";
+import { UI_CONFIG } from "../game/config/ui.config.js";
 import { signUp, login } from "./auth.js";
 import { runIntro, startMatrixRain } from "./intro.js";
 import { goToGame, replaceLoginUrl } from "../shared/navigation.js";
@@ -17,45 +19,16 @@ const postLoginCutscene = document.getElementById("postLoginCutscene");
 const introPanel = document.getElementById("intro");
 const subtitle = document.getElementById("subtitle");
 const gameplayTip = document.getElementById("gameplayTip");
-const mobileBlocker = document.getElementById("mobileBlocker");
-
-function isMobileDevice() {
-  const ua = navigator.userAgent || "";
-  const phoneOrTabletUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
-  const touchSmallScreen = (navigator.maxTouchPoints || 0) > 1 && Math.min(window.innerWidth, window.innerHeight) <= 900;
-  return phoneOrTabletUA || touchSmallScreen;
-}
-
-function lockMobilePlayers() {
-  if (!isMobileDevice()) return false;
-  document.documentElement.dataset.device = "mobile-blocked";
-  document.body.dataset.device = "mobile-blocked";
-  if (mobileBlocker) mobileBlocker.hidden = false;
-  return true;
-}
 
 function configureViewportMode() {
-  const width = window.innerWidth;
-  const hasTouch = window.matchMedia("(pointer: coarse)").matches;
-  const deviceMemory = navigator.deviceMemory || 8;
-  const cpuCores = navigator.hardwareConcurrency || 8;
-  const isMobile = isMobileDevice();
-  const isTablet = false;
-  const isLowPower = isMobile || deviceMemory <= 4 || cpuCores <= 4;
-
-  const device = isMobile ? "mobile-blocked" : "desktop";
-  const performance = isLowPower ? "low" : "high";
-
-  document.documentElement.dataset.device = device;
-  document.documentElement.dataset.performance = performance;
-  document.body.dataset.device = device;
-  document.body.dataset.performance = performance;
-  document.documentElement.style.setProperty("--app-vh", `${window.innerHeight * 0.01}px`);
+  return applyViewportProfile({
+    mobileMaxWidth: UI_CONFIG.windows.mobileBreakpoint,
+    compactMaxWidth: UI_CONFIG.windows.compactBreakpoint
+  });
 }
 
 configureViewportMode();
 window.addEventListener("resize", configureViewportMode, { passive: true });
-const mobileLocked = lockMobilePlayers();
 
 const gameplayTips = [
   "Keep your signal quiet. Loud commands wake stronger countermeasures.",
@@ -66,6 +39,10 @@ const gameplayTips = [
 
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function getHandoffDelay() {
+  return UI_CONFIG.login.handoffDelayMs;
 }
 
 async function enterGameWithCutscene() {
@@ -79,14 +56,14 @@ async function enterGameWithCutscene() {
   document.body.dataset.sequence = "handoff";
   gameplayTip.textContent = gameplayTips[Math.floor(Math.random() * gameplayTips.length)];
 
-  await wait(30000);
+  await wait(getHandoffDelay());
   goToGame();
 }
 
 let introDone = false;
 let isSignupMode = false;
 let transferStarted = false;
-if (!mobileLocked) startMatrixRain();
+startMatrixRain();
 
 const params = new URLSearchParams(window.location.search);
 const loggedOutFlag = params.get("loggedOut") === "1";
@@ -96,6 +73,7 @@ function setMode(signupMode) {
   usernameInput.closest(".field").classList.toggle("hidden", !signupMode);
   signupBtn.classList.toggle("hidden", !signupMode);
   loginBtn.classList.toggle("hidden", signupMode);
+  passwordInput.autocomplete = signupMode ? "new-password" : "current-password";
   switchBtn.textContent = signupMode ? "Return to Operator Authorization" : "Request New Blackline Callsign";
   subtitle.textContent = signupMode ? "Enroll a cleared asset into the Sector 204 command ledger." : "Unauthorized presence detected. Prove clearance before the grid notices.";
   statusMsg.textContent = signupMode ? "Awaiting asset registration packet." : "Ashfall uplink quiet. Secure gate standing by.";
@@ -110,9 +88,19 @@ function mapAuthError(errorCode) {
       return "No cleared operator found in the ghost ledger.";
     case "auth/email-already-in-use":
       return "Command channel already bound to a cleared asset.";
+    case "auth/weak-password":
+      return "Cipher key too weak. Use at least 6 characters.";
+    case "auth/invalid-email":
+      return "Command channel must be a valid email address.";
     default:
       return "Access denied by strategic gate. Retry.";
   }
+}
+
+function setAuthButtonsDisabled(disabled) {
+  loginBtn.disabled = disabled;
+  signupBtn.disabled = disabled;
+  switchBtn.disabled = disabled;
 }
 
 switchBtn.addEventListener("click", () => setMode(!isSignupMode));
@@ -125,14 +113,19 @@ forceLogoutBtn.addEventListener("click", async () => {
 loginBtn.addEventListener("click", async () => {
   const email = emailInput.value.trim();
   const password = passwordInput.value;
-  if (!email || !password) return (statusMsg.textContent = "Command channel and cipher key required.");
+  if (!email || !password) {
+    statusMsg.textContent = "Command channel and cipher key required.";
+    return;
+  }
 
+  setAuthButtonsDisabled(true);
   statusMsg.textContent = "Verifying operator clearance...";
   try {
     await login(email, password);
     await enterGameWithCutscene();
   } catch (error) {
     statusMsg.textContent = mapAuthError(error.code);
+    setAuthButtonsDisabled(false);
   }
 });
 
@@ -140,18 +133,23 @@ signupBtn.addEventListener("click", async () => {
   const username = usernameInput.value.trim();
   const email = emailInput.value.trim();
   const password = passwordInput.value;
-  if (!username || !email || !password) return (statusMsg.textContent = "Callsign, channel, and cipher key required.");
+  if (!username || !email || !password) {
+    statusMsg.textContent = "Callsign, channel, and cipher key required.";
+    return;
+  }
 
+  setAuthButtonsDisabled(true);
   statusMsg.textContent = "Registering cleared blackline asset...";
   try {
     await signUp(email, password, username);
     await enterGameWithCutscene();
   } catch (error) {
     statusMsg.textContent = mapAuthError(error.code);
+    setAuthButtonsDisabled(false);
   }
 });
 
-if (!mobileLocked) onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, async (user) => {
   if (user && !loggedOutFlag) return enterGameWithCutscene();
 
   if (!introDone) {

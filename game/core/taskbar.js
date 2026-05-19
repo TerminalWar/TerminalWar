@@ -1,13 +1,16 @@
 import { signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { createElement, createIcon } from "../../shared/dom.js";
 import { GAME_CONFIG } from "../config/game.config.js";
 import { UI_CONFIG } from "../config/ui.config.js";
 import { auth } from "../../shared/firebase.js";
 import { goToLogin } from "../../shared/navigation.js";
+import { getAppAccess } from "./appAccess.js";
 import { getApps, getPinnedApps } from "./appLoader.js";
-import { getOperatorName } from "./state.js";
+import { desktopState, getOperatorName } from "./state.js";
 import { getOpenWindowRecords, openAppWindow, restoreWindow } from "./windowManager.js";
 
 let refs;
+let notify = () => {};
 
 function formatFutureDate(date) {
   return new Intl.DateTimeFormat(UI_CONFIG.clock.locale, {
@@ -33,90 +36,124 @@ function togglePanel(panel, force) {
   panel.hidden = !shouldOpen;
 }
 
-function renderStartMenu() {
-  refs.startMenu.innerHTML = `
-    <div class="start-header">
-      <div>
-        <p class="eyebrow">Installed apps</p>
-        <h2>${GAME_CONFIG.osName}</h2>
-      </div>
-      <span>${GAME_CONFIG.loreYear}</span>
-    </div>
-    <div class="start-grid"></div>
-  `;
+function buildAppButton(app, className) {
+  const access = getAppAccess(app, desktopState.playerProfile);
+  const button = createElement("button", {
+    type: "button",
+    className: `${className} ${access.canOpen ? "" : "is-locked"}`.trim(),
+    title: access.canOpen ? app.name : `${app.name} — ${access.reason}`,
+    attributes: { "aria-disabled": access.canOpen ? "false" : "true" }
+  });
 
-  const grid = refs.startMenu.querySelector(".start-grid");
-  for (const app of getApps()) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "start-app";
-    button.innerHTML = `
-      <img src="${app.icon}" alt="" />
-      <span>${app.shortName}</span>
-      ${app.unlock?.rankRequired ? `<small>Rank ${app.unlock.rankRequired}</small>` : ""}
-    `;
-    button.addEventListener("click", () => {
-      togglePanel(refs.startMenu, false);
-      openAppWindow(app);
-    });
-    grid.append(button);
-  }
+  button.append(createIcon(app.icon), createElement("span", { text: app.shortName }));
+  if (!access.canOpen) button.append(createElement("small", { text: access.reason }));
+  button.addEventListener("click", () => {
+    if (!access.canOpen) {
+      notify(`${app.shortName} is locked. ${access.reason}.`);
+      return;
+    }
+    togglePanel(refs.startMenu, false);
+    openAppWindow(app);
+  });
+  return button;
+}
+
+function renderStartMenu() {
+  refs.startMenu.replaceChildren();
+  const header = createElement("div", { className: "start-header" }, [
+    createElement("div", {}, [
+      createElement("p", { className: "eyebrow", text: "Installed apps" }),
+      createElement("h2", { text: GAME_CONFIG.osName })
+    ]),
+    createElement("span", { text: String(GAME_CONFIG.loreYear) })
+  ]);
+  const grid = createElement("div", { className: "start-grid" });
+  for (const app of getApps()) grid.append(buildAppButton(app, "start-app"));
+  refs.startMenu.append(header, grid);
 }
 
 function renderClockPanel(now = new Date()) {
-  refs.clockPanel.innerHTML = `
-    <div class="clock-card">
-      <p class="eyebrow">System date</p>
-      <strong>${formatFutureTime(now)} ${UI_CONFIG.clock.futureYear}</strong>
-      <span>${formatFutureDate(now)}</span>
-    </div>
-    <div class="operator-card">
-      <span>Logged in as</span>
-      <strong>${getOperatorName(GAME_CONFIG.session.fallbackOperator)}</strong>
-    </div>
-    <button id="logoutBtn" class="logout-button" type="button">Logout</button>
-  `;
+  refs.clockPanel.replaceChildren();
+  const clockCard = createElement("div", { className: "clock-card" }, [
+    createElement("p", { className: "eyebrow", text: "System date" }),
+    createElement("strong", { text: `${formatFutureTime(now)} ${UI_CONFIG.clock.futureYear}` }),
+    createElement("span", { text: formatFutureDate(now) })
+  ]);
+  const operatorCard = createElement("div", { className: "operator-card" }, [
+    createElement("span", { text: "Logged in as" }),
+    createElement("strong", { text: getOperatorName(GAME_CONFIG.session.fallbackOperator) })
+  ]);
+  const logoutButton = createElement("button", { type: "button", className: "logout-button", text: "Logout" });
 
-  refs.clockPanel.querySelector("#logoutBtn").addEventListener("click", async () => {
-    const button = refs.clockPanel.querySelector("#logoutBtn");
-    button.disabled = true;
-    button.textContent = "Logging out…";
+  logoutButton.addEventListener("click", async () => {
+    logoutButton.disabled = true;
+    logoutButton.textContent = "Logging out…";
     try {
       await signOut(auth);
       goToLogin(GAME_CONFIG.session.logoutRedirectQuery);
     } catch (error) {
       console.error("Logout failed", error);
-      button.disabled = false;
-      button.textContent = "Logout failed — retry";
+      logoutButton.disabled = false;
+      logoutButton.textContent = "Logout failed — retry";
     }
   });
+
+  refs.clockPanel.append(clockCard, operatorCard, logoutButton);
 }
 
 function tickClock() {
   const now = new Date();
-  refs.clockButton.innerHTML = `<span>${formatFutureTime(now)}</span><small>${UI_CONFIG.clock.futureYear}</small>`;
+  refs.clockButton.replaceChildren(
+    createElement("span", { text: formatFutureTime(now) }),
+    createElement("small", { text: String(UI_CONFIG.clock.futureYear) })
+  );
   if (!refs.clockPanel.hidden) renderClockPanel(now);
 }
 
-export function refreshTaskbarWindows() {
-  refs.windowStrip.innerHTML = "";
-  for (const record of getOpenWindowRecords()) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = `taskbar-window ${record.element.hidden ? "is-minimized" : ""}`;
-    button.innerHTML = `<img src="${record.app.icon}" alt="" /><span>${record.app.shortName}</span>`;
-    button.addEventListener("click", () => restoreWindow(record.id));
-    refs.windowStrip.append(button);
+function renderPinnedApps() {
+  refs.pinnedApps.replaceChildren();
+  for (const app of getPinnedApps(UI_CONFIG.taskbar.pinnedAppIds)) {
+    const access = getAppAccess(app, desktopState.playerProfile);
+    const button = createElement("button", {
+      type: "button",
+      className: `pinned-app ${access.canOpen ? "" : "is-locked"}`.trim(),
+      title: access.canOpen ? app.name : `${app.name} — ${access.reason}`,
+      attributes: { "aria-disabled": access.canOpen ? "false" : "true" }
+    }, [createIcon(app.icon)]);
+    button.addEventListener("click", () => {
+      if (!access.canOpen) {
+        notify(`${app.shortName} is locked. ${access.reason}.`);
+        return;
+      }
+      openAppWindow(app);
+    });
+    refs.pinnedApps.append(button);
   }
 }
 
-export function initTaskbar({ taskbar, startMenu, clockPanel }) {
-  taskbar.innerHTML = `
-    <button class="app-launcher-button" type="button" aria-label="${UI_CONFIG.taskbar.appButtonTitle}">${UI_CONFIG.taskbar.appButtonLabel}</button>
-    <div class="pinned-apps" aria-label="Pinned apps"></div>
-    <div class="taskbar-window-strip" aria-label="Open windows"></div>
-    <button class="clock-button" type="button" aria-label="Open time, calendar, and logout panel"></button>
-  `;
+export function refreshTaskbarWindows() {
+  if (!refs) return;
+  refs.windowStrip.replaceChildren();
+  for (const record of getOpenWindowRecords()) {
+    const button = createElement("button", {
+      type: "button",
+      className: `taskbar-window ${record.element.hidden ? "is-minimized" : ""}`.trim()
+    }, [createIcon(record.app.icon), createElement("span", { text: record.app.shortName })]);
+    button.addEventListener("click", () => restoreWindow(record.id));
+    refs.windowStrip.append(button);
+  }
+  renderPinnedApps();
+  renderStartMenu();
+}
+
+export function initTaskbar({ taskbar, startMenu, clockPanel, showToast }) {
+  notify = showToast || notify;
+  taskbar.replaceChildren(
+    createElement("button", { type: "button", className: "app-launcher-button", text: UI_CONFIG.taskbar.appButtonLabel, ariaLabel: UI_CONFIG.taskbar.appButtonTitle }),
+    createElement("div", { className: "pinned-apps", attributes: { "aria-label": "Pinned apps" } }),
+    createElement("div", { className: "taskbar-window-strip", attributes: { "aria-label": "Open windows" } }),
+    createElement("button", { type: "button", className: "clock-button", ariaLabel: "Open time, calendar, and logout panel" })
+  );
 
   refs = {
     taskbar,
@@ -134,15 +171,7 @@ export function initTaskbar({ taskbar, startMenu, clockPanel }) {
     togglePanel(refs.clockPanel);
   });
 
-  for (const app of getPinnedApps(UI_CONFIG.taskbar.pinnedAppIds)) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "pinned-app";
-    button.title = app.name;
-    button.innerHTML = `<img src="${app.icon}" alt="" />`;
-    button.addEventListener("click", () => openAppWindow(app));
-    refs.pinnedApps.append(button);
-  }
+  renderPinnedApps();
 
   document.addEventListener("click", (event) => {
     if (!refs.startMenu.hidden && !refs.startMenu.contains(event.target) && !refs.launcher.contains(event.target)) {
