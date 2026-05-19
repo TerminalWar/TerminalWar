@@ -2299,3 +2299,66 @@ body {
     font-size: clamp(1.7rem, 5vw, 3.8rem);
   }
 }
+
+/* 2026 ux refactor: reliable cinematic layers, mobile readability, and fast handoff controls */
+.password-row { display:flex; gap:8px; align-items:center; }
+.password-row input { flex:1; }
+.inline-ghost { min-width:72px; }
+.cutscene-actions { margin-top: 10px; }
+
+.post-login-cutscene .topography-field,
+.post-login-cutscene .europe-map { position: relative; overflow: hidden; isolation: isolate; }
+
+.post-login-cutscene .bomber,
+.post-login-cutscene .nuke-bomber,
+.post-login-cutscene .falling-nuke,
+.post-login-cutscene .mushroom-cloud { z-index: 6; opacity: 1 !important; visibility: visible !important; }
+
+.post-login-cutscene .nuke-bomber {
+  width: 126px !important;
+  height: 48px !important;
+  top: 19% !important;
+  left: -18% !important;
+  transform: translateZ(0);
+  animation: nukeBomberPassStable 8s linear infinite !important;
+}
+
+.post-login-cutscene .nuke-bomber::before,
+.post-login-cutscene .nuke-bomber::after {
+  content: "";
+  position: absolute;
+  background: linear-gradient(135deg, #d9f2ff, #7ac7ff);
+}
+.post-login-cutscene .nuke-bomber::before { inset: 16px 18px 18px 12px; clip-path: polygon(0 50%, 36% 0, 100% 12%, 92% 75%, 42% 100%); }
+.post-login-cutscene .nuke-bomber::after { width: 38px; height: 10px; right: 4px; top: 20px; clip-path: polygon(0 0, 100% 50%, 0 100%); }
+
+.post-login-cutscene .falling-nuke {
+  width: 16px !important;
+  height: 42px !important;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f2fbff, #7bd4ff 75%, #134a6d);
+  box-shadow: 0 0 18px rgba(146, 216, 255, 0.65);
+  animation: nukeDropStable 8s linear infinite !important;
+}
+
+@keyframes nukeBomberPassStable {
+  0% { left: -18%; top: 17%; }
+  45% { left: 48%; top: 26%; }
+  100% { left: 118%; top: 36%; }
+}
+@keyframes nukeDropStable {
+  0%, 42% { opacity: 0; transform: translate(0, -20px); }
+  52% { opacity: 1; transform: translate(0, 0); }
+  100% { opacity: 0; transform: translate(165px, 240px); }
+}
+
+@media (max-width: 720px) {
+  .screen { gap: 10px; }
+  .post-login-cutscene { padding: 10px; }
+  .cutscene-actions .ghost-btn { width: 100%; min-height: 46px; }
+  .nuke-bomber { transform: scale(0.85); transform-origin: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .post-login-cutscene * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition: none !important; }
+}

@@ -28,9 +28,11 @@ export const UI_CONFIG = {
     compactColumns: 5
   },
   toast: {
-    durationMs: 3000
+    durationMs: 3400
   },
   login: {
-    handoffDelayMs: 30000
+    handoffDelayMs: 8000,
+    minHandoffDelayMs: 2800,
+    skipDelayMs: 400
   }
 };

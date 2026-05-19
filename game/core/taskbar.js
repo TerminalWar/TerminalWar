@@ -134,7 +134,9 @@ function renderPinnedApps() {
 export function refreshTaskbarWindows() {
   if (!refs) return;
   refs.windowStrip.replaceChildren();
-  for (const record of getOpenWindowRecords()) {
+  const openRecords = getOpenWindowRecords();
+  refs.mobileWindowButton.textContent = `Apps ${openRecords.length}`;
+  for (const record of openRecords) {
     const button = createElement("button", {
       type: "button",
       className: `taskbar-window ${record.element.hidden ? "is-minimized" : ""}`.trim()
@@ -152,6 +154,7 @@ export function initTaskbar({ taskbar, startMenu, clockPanel, showToast }) {
     createElement("button", { type: "button", className: "app-launcher-button", text: UI_CONFIG.taskbar.appButtonLabel, ariaLabel: UI_CONFIG.taskbar.appButtonTitle }),
     createElement("div", { className: "pinned-apps", attributes: { "aria-label": "Pinned apps" } }),
     createElement("div", { className: "taskbar-window-strip", attributes: { "aria-label": "Open windows" } }),
+    createElement("button", { type: "button", className: "mobile-window-button", text: "Apps 0", ariaLabel: "Open window list" }),
     createElement("button", { type: "button", className: "clock-button", ariaLabel: "Open time, calendar, and logout panel" })
   );
 
@@ -162,10 +165,12 @@ export function initTaskbar({ taskbar, startMenu, clockPanel, showToast }) {
     launcher: taskbar.querySelector(".app-launcher-button"),
     pinnedApps: taskbar.querySelector(".pinned-apps"),
     windowStrip: taskbar.querySelector(".taskbar-window-strip"),
-    clockButton: taskbar.querySelector(".clock-button")
+    clockButton: taskbar.querySelector(".clock-button"),
+    mobileWindowButton: taskbar.querySelector(".mobile-window-button")
   };
 
   refs.launcher.addEventListener("click", () => togglePanel(refs.startMenu));
+  refs.mobileWindowButton.addEventListener("click", () => togglePanel(refs.startMenu, true));
   refs.clockButton.addEventListener("click", () => {
     renderClockPanel();
     togglePanel(refs.clockPanel);

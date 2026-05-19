@@ -101,7 +101,7 @@
 
             <div class="field">
               <label for="password">Quantum Cipher Key</label>
-              <input id="password" type="password" autocomplete="current-password" placeholder="••••••••••••" />
+              <div class="password-row"><input id="password" type="password" autocomplete="current-password" placeholder="••••••••••••" /><button id="togglePasswordBtn" class="ghost-btn inline-ghost" type="button">Show</button></div>
             </div>
 
             <div class="actions">
@@ -169,7 +169,10 @@
         <aside class="loading-sidebar">
           <div class="asset-status">DOWNLOADING WARGRID ASSETS</div>
           <div class="asset-bar" aria-hidden="true"><span></span></div>
-          <div class="asset-percent">SECURE HANDOFF // 30 SEC</div>
+          <div class="asset-percent" id="assetPercent">SECURE HANDOFF // 08 SEC</div>
+          <div class="cutscene-actions">
+            <button id="skipCutsceneBtn" class="ghost-btn" type="button">Skip cinematic and continue</button>
+          </div>
           <div class="tip-box">
             <span>FIELD TIP</span>
             <p id="gameplayTip">Keep your signal quiet. Loud commands wake stronger countermeasures.</p>
