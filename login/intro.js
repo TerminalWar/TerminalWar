@@ -9,8 +9,8 @@ export function startMatrixRain() {
   resize();
   window.addEventListener("resize", resize);
 
-  const chars = "01";
-  const size = 16;
+  const chars = "01◇△ NATO AI SATCOM DEFCON 2050";
+  const size = 15;
   let columns = Math.floor(canvas.width / size);
   let drops = Array.from({ length: columns }, () => Math.random() * -canvas.height);
 
@@ -18,9 +18,9 @@ export function startMatrixRain() {
     columns = Math.floor(canvas.width / size);
     if (drops.length !== columns) drops = Array.from({ length: columns }, () => Math.random() * -canvas.height);
 
-    ctx.fillStyle = "rgba(2, 7, 6, 0.2)";
+    ctx.fillStyle = "rgba(2, 6, 13, 0.24)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#59ffc5";
+    ctx.fillStyle = Math.random() > 0.94 ? "#ff4368" : "#73f7ff";
     ctx.font = `${size}px monospace`;
 
     for (let i = 0; i < drops.length; i++) {
@@ -42,17 +42,31 @@ export async function runIntro() {
   const intro = document.getElementById("intro");
   const output = document.getElementById("introOutput");
   const lines = [
-    "[SECTOR_204] connecting to shadow relay...",
-    "injecting spoofed biometric signature...",
-    "breaching node firewall...",
-    "access granted // welcome to sector 204"
+    "[NATO-BLACKLINE] waking orbital cyber command lattice...",
+    "[SATCOM] syncing encrypted theater maps across contested zones...",
+    "[AI-SENTINEL] validating operator biometrics against ghost ledger...",
+    "[QUANTUM-FIREWALL] rotating cipher gates // hostile packets detected...",
+    "[STRIKE-NET] routing access through Sector 204 blacksite relay...",
+    "[CLEARANCE] strategic access window open // authenticate operator"
   ];
 
   for (const line of lines) {
-    output.textContent += `> ${line}\n`;
-    await new Promise((resolve) => setTimeout(resolve, 700));
+    const row = document.createElement("span");
+    row.className = "boot-line";
+
+    const prefix = document.createElement("span");
+    prefix.className = "boot-prefix";
+    prefix.textContent = "> ";
+
+    const text = document.createElement("span");
+    text.className = "boot-text";
+    text.textContent = line;
+
+    row.append(prefix, text, document.createTextNode("\n"));
+    output.appendChild(row);
+    await new Promise((resolve) => setTimeout(resolve, 620));
   }
 
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  await new Promise((resolve) => setTimeout(resolve, 700));
   intro.classList.add("hidden");
 }

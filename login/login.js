@@ -2,6 +2,7 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 import { auth } from "../shared/firebase.js";
 import { signUp, login } from "./auth.js";
 import { runIntro, startMatrixRain } from "./intro.js";
+import { goToGame, replaceLoginUrl } from "../shared/navigation.js";
 
 const usernameInput = document.getElementById("username");
 const emailInput = document.getElementById("email");
@@ -26,45 +27,41 @@ function setMode(signupMode) {
   usernameInput.closest(".field").classList.toggle("hidden", !signupMode);
   signupBtn.classList.toggle("hidden", !signupMode);
   loginBtn.classList.toggle("hidden", signupMode);
-  switchBtn.textContent = signupMode ? "Already have access? Log In" : "Need a Neural_ID? Sign Up";
-  subtitle.textContent = signupMode ? "Register Operator in Sector 204" : "Welcome to Sector 204";
-  statusMsg.textContent = signupMode ? "Create your operator profile." : "Ready for infiltration.";
+  switchBtn.textContent = signupMode ? "Return to Operator Authorization" : "Request New Blackline Callsign";
+  subtitle.textContent = signupMode ? "Enroll a cleared asset into the Sector 204 command ledger." : "Operator verification required for live cyber theater.";
+  statusMsg.textContent = signupMode ? "Awaiting asset registration packet." : "Secure gate standing by.";
 }
 
 function mapAuthError(errorCode) {
   switch (errorCode) {
     case "auth/wrong-password":
     case "auth/invalid-credential":
-      return "Wrong decrypt key.";
+      return "Cipher key rejected by blackline command.";
     case "auth/user-not-found":
-      return "Operator not found.";
+      return "No cleared operator found in the ghost ledger.";
     case "auth/email-already-in-use":
-      return "Signal_Email already linked.";
+      return "Command channel already bound to a cleared asset.";
     default:
-      return "Access denied. Retry.";
+      return "Access denied by strategic gate. Retry.";
   }
-}
-
-function redirectToGame() {
-  window.location.href = "/game/";
 }
 
 switchBtn.addEventListener("click", () => setMode(!isSignupMode));
 
 forceLogoutBtn.addEventListener("click", async () => {
   await signOut(auth);
-  statusMsg.textContent = "Session cleared. You can test login again.";
+  statusMsg.textContent = "Local clearance cache purged. Gate reset.";
 });
 
 loginBtn.addEventListener("click", async () => {
   const email = emailInput.value.trim();
   const password = passwordInput.value;
-  if (!email || !password) return (statusMsg.textContent = "Email + key required.");
+  if (!email || !password) return (statusMsg.textContent = "Command channel and cipher key required.");
 
-  statusMsg.textContent = "Verifying credentials...";
+  statusMsg.textContent = "Verifying operator clearance...";
   try {
     await login(email, password);
-    redirectToGame();
+    goToGame();
   } catch (error) {
     statusMsg.textContent = mapAuthError(error.code);
   }
@@ -74,19 +71,19 @@ signupBtn.addEventListener("click", async () => {
   const username = usernameInput.value.trim();
   const email = emailInput.value.trim();
   const password = passwordInput.value;
-  if (!username || !email || !password) return (statusMsg.textContent = "Username, email, and key required.");
+  if (!username || !email || !password) return (statusMsg.textContent = "Callsign, channel, and cipher key required.");
 
-  statusMsg.textContent = "Registering Neural_ID...";
+  statusMsg.textContent = "Registering cleared blackline asset...";
   try {
     await signUp(email, password, username);
-    redirectToGame();
+    goToGame();
   } catch (error) {
     statusMsg.textContent = mapAuthError(error.code);
   }
 });
 
 onAuthStateChanged(auth, async (user) => {
-  if (user && !loggedOutFlag) return redirectToGame();
+  if (user && !loggedOutFlag) return goToGame();
 
   if (!introDone) {
     await runIntro();
@@ -97,7 +94,7 @@ onAuthStateChanged(auth, async (user) => {
   setMode(false);
 
   if (loggedOutFlag) {
-    statusMsg.textContent = "Logged out successfully. Test away.";
-    window.history.replaceState({}, "", "/login/");
+    statusMsg.textContent = "Operator signed out. Blackline gate reset.";
+    replaceLoginUrl();
   }
 });
